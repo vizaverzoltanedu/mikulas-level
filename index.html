@@ -5,408 +5,220 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Mikulás személyes levelei</title>
-
 <style>
-* { box-sizing: border-box; }
-
-body {
-  margin: 0;
-  font-family: Georgia, "Times New Roman", serif;
-  color: #3b2020;
-  background: #f4eee4;
-}
-
-header {
-  background: linear-gradient(135deg, #8e1022, #c62828);
-  color: white;
-  text-align: center;
-  padding: 24px 12px;
-  font-family: Arial, sans-serif;
-}
-
-header h1 { margin: 0 0 8px; }
-
-main {
-  max-width: 850px;
-  margin: 25px auto;
-  padding: 12px;
-}
-
-section {
-  background: white;
-  padding: 22px;
-  margin-bottom: 20px;
-  border-radius: 15px;
-  box-shadow: 0 5px 18px #00000012;
-}
-
-input, textarea, button {
-  display: block;
-  width: 100%;
-  padding: 12px;
-  margin: 10px 0;
-  font: 16px Arial, sans-serif;
-}
-
-textarea { min-height: 160px; resize: vertical; }
-
-button {
-  background: #176b45;
-  color: white;
-  border: 0;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-button:hover { filter: brightness(1.08); }
-
-label {
-  display: block;
-  margin-top: 16px;
-  font-family: Arial, sans-serif;
-  font-weight: bold;
-}
-
-.hidden { display: none !important; }
-
-.item {
-  border: 1px solid #ead6c8;
-  border-radius: 10px;
-  padding: 15px;
-  margin: 12px 0;
-  overflow-wrap: anywhere;
-}
-
-.item a {
-  display: block;
-  margin: 10px 0;
-}
-
-.letter {
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-  line-height: 1.9;
-  font-size: 19px;
-  padding: 30px;
-  color: #492525;
-  background:
-    radial-gradient(circle at 10% 10%, #ffffffaa 0 2px, transparent 3px),
-    radial-gradient(circle at 90% 20%, #ffffffaa 0 3px, transparent 4px),
-    linear-gradient(135deg, #fff8e7, #ffe4e1 50%, #e4f5e9);
-  background-size: 45px 45px, 60px 60px, auto;
-  border: 4px double #b22222;
-  border-radius: 18px;
-  box-shadow: 0 8px 22px #781e1e2e;
-  position: relative;
-}
-
-.letter::before {
-  content: "❄️  🎄  🎅  🎄  ❄️";
-  display: block;
-  text-align: center;
-  font-size: 24px;
-  margin-bottom: 18px;
-}
-
-.letter::after {
-  content: "🎄 Boldog Mikulást! 🎄";
-  display: block;
-  text-align: center;
-  font-weight: bold;
-  color: #a81728;
-  margin-top: 24px;
-}
-
-.media-player {
-  width: 100%;
-  margin-top: 18px;
-}
-
-#olvaso h2 {
-  text-align: center;
-  color: #a81728;
-}
-
-#olvasoNev {
-  text-align: center;
-  color: #176b45;
-}
-
-.qr {
-  max-width: 300px;
-  width: 100%;
-  display: block;
-  margin: 15px auto;
-}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f4eee4;color:#3b2020}
+header{background:linear-gradient(135deg,#8e1022,#c62828);color:white;text-align:center;padding:24px 12px}
+main{max-width:850px;margin:25px auto;padding:12px}
+section{background:white;padding:22px;margin-bottom:20px;border-radius:15px;box-shadow:0 5px 18px #00000012}
+input,textarea,button{display:block;width:100%;padding:12px;margin:10px 0;font-size:16px}
+textarea{min-height:160px}
+button{background:#176b45;color:white;border:0;border-radius:8px;cursor:pointer}
+label{display:block;margin-top:16px;font-weight:bold}
+.hidden{display:none!important}
+.item{border:1px solid #ead6c8;border-radius:10px;padding:15px;margin:12px 0;overflow-wrap:anywhere}
+.item a{display:block;margin:10px 0}
+.letter{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.9;font-size:19px;padding:30px;color:#492525;background:radial-gradient(circle at 10% 10%,#ffffffaa 0 2px,transparent 3px),radial-gradient(circle at 90% 20%,#ffffffaa 0 3px,transparent 4px),linear-gradient(135deg,#fff8e7,#ffe4e1 50%,#e4f5e9);background-size:45px 45px,60px 60px,auto;border:4px double #b22222;border-radius:18px;box-shadow:0 8px 22px #781e1e2e;white-space:pre-wrap}
+.letter::before{content:"❄️  🎄  🎅  🎄  ❄️";display:block;text-align:center;font-size:24px;margin-bottom:18px}
+.letter::after{content:"🎄 Boldog Mikulást! 🎄";display:block;text-align:center;font-weight:bold;color:#a81728;margin-top:24px}
+.media-player{width:100%;margin-top:18px}
+#olvaso h2,#olvasoNev{text-align:center;color:#a81728}
 </style>
 </head>
-
 <body>
 <header>
-  <h1>🎅 A Mikulás személyes levelei 🎄</h1>
-  <p>Varázslatos, személyre szóló üzenetek</p>
+<h1>🎅 A Mikulás személyes levelei 🎄</h1>
+<p>Varázslatos, személyre szóló üzenetek</p>
 </header>
-
 <main>
 
 <section id="login">
-  <h2>🔐 Admin belépés</h2>
-  <input id="jelszo" type="password" placeholder="Admin jelszó">
-  <button onclick="belepes()">Belépés</button>
-  <p id="hiba" role="status"></p>
+<h2>🔐 Admin belépés</h2>
+<input id="jelszo" type="password" placeholder="Admin jelszó">
+<button onclick="belepes()">Belépés</button>
+<p id="hiba"></p>
 </section>
 
 <div id="admin" class="hidden">
-  <section>
-    <h2>🎁 Új Mikulás-levél</h2>
-
-    <label for="nev">Megajándékozott neve</label>
-    <input id="nev" placeholder="Például: Bence">
-
-    <label for="uzenet">Személyes levél</label>
-    <textarea id="uzenet" placeholder="Kedves Bence! Írd ide a személyes levelet..."></textarea>
-
-    <label for="videoFile">🎬 Mikulás-videó (MP4)</label>
-    <input id="videoFile" type="file" accept=".mp4,video/mp4">
-
-    <label for="audioFile">🎵 Mikulás-hangüzenet (MP3)</label>
-    <input id="audioFile" type="file" accept=".mp3,audio/mpeg">
-
-    <button onclick="mentes()">💾 Levél mentése</button>
-    <button onclick="ujLevel()" style="background:#64748b">Új levél készítése</button>
-    <p id="eredmeny" role="status"></p>
-  </section>
-
-  <section>
-    <h2>📜 Korábbi levelek</h2>
-    <div id="lista"></div>
-  </section>
+<section>
+<h2>🎁 Új Mikulás-levél</h2>
+<label for="nev">Megajándékozott neve</label>
+<input id="nev" placeholder="Például: Bence">
+<label for="uzenet">Személyes levél</label>
+<textarea id="uzenet" placeholder="Kedves Bence!"></textarea>
+<label for="videoFile">🎬 Mikulás-videó (MP4)</label>
+<input id="videoFile" type="file" accept=".mp4,video/mp4">
+<label for="audioFile">🎵 Mikulás-hangüzenet (MP3)</label>
+<input id="audioFile" type="file" accept=".mp3,audio/mpeg">
+<p>A fájlfeltöltés ezen a változaton még csak ezen a böngészőn belül használható. A más telefonon történő lejátszáshoz online tárhely szükséges.</p>
+<button onclick="mentes()">💾 Levél mentése</button>
+<button onclick="ujLevel()" style="background:#64748b">Új levél készítése</button>
+<p id="eredmeny"></p>
+</section>
+<section>
+<h2>📜 Korábbi levelek</h2>
+<div id="lista"></div>
+</section>
 </div>
 
 <section id="olvaso" class="hidden">
-  <h2>🎅 Személyes Mikulás-levél 🎄</h2>
-  <h3 id="olvasoNev"></h3>
-  <div id="olvasoLevel" class="letter"></div>
-
-  <video id="lejatszoVideo" class="media-player" controls playsinline></video>
-  <audio id="lejatszoAudio" class="media-player" controls></audio>
-  <p id="mediaUzenet"></p>
+<h2>🎅 Személyes Mikulás-levél 🎄</h2>
+<h3 id="olvasoNev"></h3>
+<div id="olvasoLevel" class="letter"></div>
+<video id="lejatszoVideo" class="media-player hidden" controls playsinline></video>
+<audio id="lejatszoAudio" class="media-player hidden" controls></audio>
+<p id="mediaUzenet"></p>
 </section>
-
 </main>
 
 <script>
-const KULCS = "mikulas_levelek_v2";
-const ADMIN_JELSZO = "Mikulas2026!";
-let szerkesztettId = null;
+const KULCS="mikulas_levelek_v3";
+const ADMIN_JELSZO="Mikulas2026!";
+let szerkesztettId=null;
 
-function betolt() {
-  try {
-    return JSON.parse(localStorage.getItem(KULCS) || "[]");
-  } catch (e) {
-    return [];
-  }
+function betolt(){
+ try{return JSON.parse(localStorage.getItem(KULCS)||"[]")}
+ catch(e){return []}
 }
-
-function tarol(adatok) {
-  localStorage.setItem(KULCS, JSON.stringify(adatok));
+function tarol(adatok){
+ localStorage.setItem(KULCS,JSON.stringify(adatok));
 }
-
-function belepes() {
-  if (document.getElementById("jelszo").value === ADMIN_JELSZO) {
-    document.getElementById("login").classList.add("hidden");
-    document.getElementById("admin").classList.remove("hidden");
-    document.getElementById("hiba").textContent = "";
-    listaFrissit();
-  } else {
-    document.getElementById("hiba").textContent = "Hibás jelszó!";
-  }
-}
-
-function link(id) {
-  return location.origin + location.pathname + "?level=" + encodeURIComponent(id);
-}
-
-function fajlAdat(fajl) {
-  return new Promise((resolve, reject) => {
-    if (!fajl) {
-      resolve(null);
-      return;
-    }
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = () => reject(new Error("A fájl nem olvasható."));
-    reader.readAsDataURL(fajl);
-  });
-}
-
-async function mentes() {
-  const nev = document.getElementById("nev").value.trim();
-  const uzenet = document.getElementById("uzenet").value.trim();
-  const videoFajl = document.getElementById("videoFile").files[0];
-  const audioFajl = document.getElementById("audioFile").files[0];
-
-  if (!nev || !uzenet) {
-    alert("Töltsd ki a nevet és a levelet!");
-    return;
-  }
-
-  if (videoFajl && videoFajl.type !== "video/mp4") {
-    alert("Kérlek, MP4 videófájlt válassz!");
-    return;
-  }
-
-  if (audioFajl && audioFajl.type !== "audio/mpeg") {
-    alert("Kérlek, MP3 hangfájlt válassz!");
-    return;
-  }
-
-  if ((videoFajl && videoFajl.size > 2 * 1024 * 1024) ||
-      (audioFajl && audioFajl.size > 2 * 1024 * 1024)) {
-    alert("A helyi böngészőtárhelyhez ez a fájl túl nagy. Használj 2 MB-nál kisebb fájlt.");
-    return;
-  }
-
-  const gombok = document.querySelectorAll("#admin button");
-  gombok.forEach(g => g.disabled = true);
-
-  try {
-    const adatok = betolt();
-    let level;
-
-    if (szerkesztettId) {
-      level = adatok.find(x => x.id === szerkesztettId);
-      if (!level) throw new Error("A levél nem található.");
-      level.nev = nev;
-      level.uzenet = uzenet;
-    } else {
-      const id = crypto.randomUUID
-        ? crypto.randomUUID()
-        : Date.now().toString(36) + Math.random().toString(36).slice(2);
-
-      level = { id, nev, uzenet, video: null, audio: null };
-      adatok.push(level);
-    }
-
-    if (videoFajl) level.video = await fajlAdat(videoFajl);
-    if (audioFajl) level.audio = await fajlAdat(audioFajl);
-
-    tarol(adatok);
-
-    document.getElementById("eredmeny").textContent =
-      "A levél mentve. Megnyitás: " + link(level.id);
-
-    ujLevel();
-    listaFrissit();
-  } catch (e) {
-    alert("Nem sikerült menteni. Lehet, hogy megtelt a böngésző tárhelye.");
-  } finally {
-    gombok.forEach(g => g.disabled = false);
-  }
-}
-
-function ujLevel() {
-  szerkesztettId = null;
-  document.getElementById("nev").value = "";
-  document.getElementById("uzenet").value = "";
-  document.getElementById("videoFile").value = "";
-  document.getElementById("audioFile").value = "";
-}
-
-function listaFrissit() {
-  const lista = document.getElementById("lista");
-  lista.replaceChildren();
-
-  betolt().forEach(level => {
-    const elem = document.createElement("div");
-    elem.className = "item";
-
-    const cim = document.createElement("strong");
-    cim.textContent = "🎁 " + level.nev;
-
-    const a = document.createElement("a");
-    a.href = link(level.id);
-    a.textContent = "Személyes levél megnyitása";
-    a.target = "_blank";
-    a.rel = "noopener noreferrer";
-
-    const qr = document.createElement("a");
-    qr.href = "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=" +
-      encodeURIComponent(link(level.id));
-    qr.textContent = "QR-kód megnyitása";
-    qr.target = "_blank";
-    qr.rel = "noopener noreferrer";
-
-    const edit = document.createElement("button");
-    edit.textContent = "✏️ Szerkesztés";
-    edit.onclick = () => {
-      document.getElementById("nev").value = level.nev;
-      document.getElementById("uzenet").value = level.uzenet;
-      document.getElementById("videoFile").value = "";
-      document.getElementById("audioFile").value = "";
-      szerkesztettId = level.id;
-      document.getElementById("eredmeny").textContent =
-        "Szerkesztés: " + level.nev +
-        ". Új fájlt választva lecserélheted a korábbit.";
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    };
-
-    const torol = document.createElement("button");
-    torol.textContent = "🗑️ Törlés";
-    torol.style.background = "#a81728";
-    torol.onclick = () => {
-      if (confirm("Biztosan törlöd ezt a levelet?")) {
-        tarol(betolt().filter(x => x.id !== level.id));
-        listaFrissit();
-      }
-    };
-
-    elem.append(cim, a, qr, edit, torol);
-    lista.appendChild(elem);
-  });
-}
-
-function levelMegnyit() {
-  const id = new URLSearchParams(location.search).get("level");
-  if (!id) return;
-
+function belepes(){
+ if(document.getElementById("jelszo").value===ADMIN_JELSZO){
   document.getElementById("login").classList.add("hidden");
-  document.getElementById("admin").classList.add("hidden");
-  document.getElementById("olvaso").classList.remove("hidden");
-
-  const level = betolt().find(x => x.id === id);
-
-  document.getElementById("olvasoNev").textContent =
-    level ? "Kedves " + level.nev + "!" : "A levél nem található";
-
-  document.getElementById("olvasoLevel").textContent =
-    level ? level.uzenet :
-    "Ez a levél ebben a böngészőben nem található.";
-
-  const video = document.getElementById("lejatszoVideo");
-  const audio = document.getElementById("lejatszoAudio");
-  const uzenet = document.getElementById("mediaUzenet");
-
-  video.classList.add("hidden");
-  audio.classList.add("hidden");
-  uzenet.textContent = "";
-
-  if (level && level.video) {
-    video.src = level.video;
-    video.classList.remove("hidden");
-  }
-
-  if (level && level.audio) {
-    audio.src = level.audio;
-    audio.classList.remove("hidden");
-  }
-
-  if (level && !level.video && !level.audio) {
-    uzenet.textContent = "Ehhez a levélhez nem tartozik hang vagy videó.";
-  }
+  document.getElementById("admin").classList.remove("hidden");
+  document.getElementById("hiba").textContent="";
+  listaFrissit();
+ }else{
+  document.getElementById("hiba").textContent="Hibás jelszó!";
+ }
 }
 
+/* A név és a levél szövege bekerül a QR-kód hivatkozásába. */
+function link(level){
+ const adat=JSON.stringify({nev:level.nev,uzenet:level.uzenet});
+ const kod=btoa(unescape(encodeURIComponent(adat)))
+  .replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
+ return location.origin+location.pathname+"#level="+kod;
+}
+
+function mentes(){
+ const nev=document.getElementById("nev").value.trim();
+ const uzenet=document.getElementById("uzenet").value.trim();
+ if(!nev||!uzenet){
+  alert("Töltsd ki a nevet és a levelet!");
+  return;
+ }
+
+ const adatok=betolt();
+ let level;
+
+ if(szerkesztettId){
+  level=adatok.find(x=>x.id===szerkesztettId);
+  if(!level)return alert("A levél nem található.");
+  level.nev=nev;
+  level.uzenet=uzenet;
+ }else{
+  level={
+   id:crypto.randomUUID?crypto.randomUUID():
+    Date.now().toString(36)+Math.random().toString(36).slice(2),
+   nev,uzenet
+  };
+  adatok.push(level);
+ }
+
+ try{
+  tarol(adatok);
+ }catch(e){
+  alert("Nem sikerült menteni. Lehet, hogy megtelt a böngésző tárhelye.");
+  return;
+ }
+
+ document.getElementById("eredmeny").textContent="A levél mentve.";
+ ujLevel();
+ listaFrissit();
+}
+
+function ujLevel(){
+ szerkesztettId=null;
+ document.getElementById("nev").value="";
+ document.getElementById("uzenet").value="";
+ document.getElementById("videoFile").value="";
+ document.getElementById("audioFile").value="";
+}
+
+function listaFrissit(){
+ const lista=document.getElementById("lista");
+ lista.replaceChildren();
+
+ betolt().forEach(level=>{
+  const elem=document.createElement("div");
+  elem.className="item";
+
+  const cim=document.createElement("strong");
+  cim.textContent="🎁 "+level.nev;
+
+  const url=link(level);
+  const a=document.createElement("a");
+  a.href=url;
+  a.textContent="Személyes levél megnyitása";
+  a.target="_blank";
+  a.rel="noopener noreferrer";
+
+  const qr=document.createElement("a");
+  qr.href="https://api.qrserver.com/v1/create-qr-code/?size=350x350&data="+encodeURIComponent(url);
+  qr.textContent="QR-kód megnyitása / nyomtatása";
+  qr.target="_blank";
+  qr.rel="noopener noreferrer";
+
+  const edit=document.createElement("button");
+  edit.textContent="✏️ Szerkesztés";
+  edit.onclick=()=>{
+   document.getElementById("nev").value=level.nev;
+   document.getElementById("uzenet").value=level.uzenet;
+   szerkesztettId=level.id;
+   document.getElementById("eredmeny").textContent="Szerkesztés: "+level.nev;
+   window.scrollTo({top:0,behavior:"smooth"});
+  };
+
+  const torol=document.createElement("button");
+  torol.textContent="🗑️ Törlés";
+  torol.style.background="#a81728";
+  torol.onclick=()=>{
+   if(confirm("Biztosan törlöd ezt a levelet?")){
+    tarol(betolt().filter(x=>x.id!==level.id));
+    listaFrissit();
+   }
+  };
+
+  elem.append(cim,a,qr,edit,torol);
+  lista.appendChild(elem);
+ });
+}
+
+function levelMegnyit(){
+ const hash=location.hash;
+ const egyezes=hash.match(/^#level=(.+)$/);
+ if(!egyezes)return;
+
+ document.getElementById("login").classList.add("hidden");
+ document.getElementById("admin").classList.add("hidden");
+ document.getElementById("olvaso").classList.remove("hidden");
+
+ try{
+  let kod=egyezes[1].replace(/-/g,"+").replace(/_/g,"/");
+  while(kod.length%4)kod+="=";
+  const adat=JSON.parse(decodeURIComponent(escape(atob(kod))));
+
+  document.getElementById("olvasoNev").textContent="Kedves "+adat.nev+"!";
+  document.getElementById("olvasoLevel").textContent=adat.uzenet;
+ }catch(e){
+  document.getElementById("olvasoNev").textContent="A levél nem olvasható";
+  document.getElementById("olvasoLevel").textContent="Ez a hivatkozás hibás vagy hiányos.";
+ }
+ document.getElementById("mediaUzenet").textContent=
+  "Ehhez a levélhez a hang és videó online tárhelyét külön kell beállítani.";
+}
 levelMegnyit();
 </script>
 </body>
