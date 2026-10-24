@@ -1,8 +1,8 @@
-<label for="video">Mikulás-videó (MP4)</label>
-<input id="videoFile" type="file" accept="video/mp4,video/*">
+<label for="audioFile">🎵 MP3 hangfájl</label>
+<input id="audioFile" type="file" accept=".mp3,audio/mpeg">
 
-<label for="audioFile">Mikulás-hangüzenet (MP3)</label>
-<input id="audioFile" type="file" accept="audio/mpeg,audio/mp3"><!DOCTYPE html>
+<label for="videoFile">🎬 MP4 videófájl</label>
+<input id="videoFile" type="file" accept=".mp4,video/mp4">
 <html lang="hu">
 <head>
 <meta charset="UTF-8">
@@ -20,7 +20,19 @@ button{background:#176b45;color:white;border:0;border-radius:7px;cursor:pointer}
 .item{border:1px solid #ddd;border-radius:8px;padding:15px;margin:12px 0}
 a{overflow-wrap:anywhere}
 .hidden{display:none}
-.letter{white-space:pre-wrap;line-height:1.8}
+.letter {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  line-height: 1.9;
+  font-size: 19px;
+  padding: 30px;
+  background: linear-gradient(135deg, #fff8e7, #ffe4e1, #e4f5e9);
+  border: 3px solid #b22222;
+  border-radius: 18px;
+  box-shadow: 0 8px 22px rgba(120, 30, 30, 0.18);
+  color: #3b2020;
+  position: relative;
+}
 </style>
 </head>
 <body>
