@@ -51,7 +51,11 @@ a{overflow-wrap:anywhere}
 <textarea id="uzenet" placeholder="Írd ide a levelet..."></textarea>
 
 <label for="video">Videó linkje (nem kötelező)</label>
-<input id="video" placeholder="https://...">
+<label for="video">Mikulás-videó (MP4)</label>
+<input id="videoFile" type="file" accept="video/mp4,video/*">
+
+<label for="audioFile">Mikulás-hangüzenet (MP3)</label>
+<input id="audioFile" type="file" accept="audio/mpeg,audio/mp3">
 
 <button onclick="mentes()">Levél mentése</button>
 <p id="eredmeny"></p>
