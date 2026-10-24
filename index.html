@@ -117,6 +117,17 @@ hr{border:0;border-top:1px solid #e5ca8250;margin:24px 0}
 }
 .signature{text-align:right;margin-top:30px;color:#e6c477;line-height:1.8}
 .signature strong{font-size:25px;display:block}
+
+/* Nyomtatógomb */
+.print-button-wrap{
+  text-align:center;
+  margin:20px 0;
+}
+#printLetterBtn{
+  font-size:16px;
+  padding:14px 24px;
+}
+
 .media-card{
   margin-top:23px;padding:18px;border-radius:16px;
   background:#071a1488;border:1px solid #d6b45b66;
@@ -160,6 +171,143 @@ footer{text-align:center;padding:18px 12px 28px;color:#d7c99e;font:13px Arial,sa
   .qr{width:180px;height:180px}
   button{max-width:100%}
 }
+
+/* Nyomtatási nézet: kizárólag maga a Mikulás-levelet tartalmazó lap */
+@media print {
+  @page {
+    size: A4;
+    margin: 15mm;
+  }
+
+  html, body {
+    width: 100% !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: white !important;
+    color: #222 !important;
+    overflow: visible !important;
+  }
+
+  body * {
+    visibility: hidden !important;
+  }
+
+  #readerPanel,
+  #readerPanel #readerContent,
+  #readerPanel .letter-shell,
+  #readerPanel .letter-shell * {
+    visibility: visible !important;
+  }
+
+  #readerPanel {
+    display: block !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    background: white !important;
+    color: #222 !important;
+  }
+
+  #readerPanel > * {
+    display: none !important;
+  }
+
+  #readerPanel #readerContent {
+    display: block !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  #readerPanel #readerContent > * {
+    display: none !important;
+  }
+
+  #readerPanel #readerContent .letter-shell {
+    display: block !important;
+    position: relative !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 25px !important;
+    border: 2px solid #b7954b !important;
+    border-radius: 10px !important;
+    background: white !important;
+    color: #222 !important;
+    box-shadow: none !important;
+    overflow: visible !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .letter-shell:before {
+    border-color: #b7954b !important;
+  }
+
+  .santa-medallion {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  .letter-kicker,
+  .letter-title,
+  .letter-title .sparkle,
+  .greeting,
+  .letter,
+  .signature,
+  .signature strong,
+  .signature span,
+  .letter-rule {
+    color: #222 !important;
+    text-shadow: none !important;
+    animation: none !important;
+  }
+
+  .letter-title {
+    font-size: 25pt !important;
+  }
+
+  .greeting {
+    font-size: 17pt !important;
+  }
+
+  .letter {
+    font-size: 12pt !important;
+    line-height: 1.7 !important;
+    overflow-wrap: anywhere !important;
+    white-space: pre-wrap !important;
+  }
+
+  .signature {
+    color: #222 !important;
+  }
+
+  .signature strong {
+    color: #222 !important;
+  }
+
+  .print-button-wrap,
+  #readerAudioBox,
+  #readerVideoBox,
+  #readerCertificateBox,
+  header,
+  footer,
+  .snowflake {
+    display: none !important;
+  }
+
+  * {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+}
+
 @media(prefers-reduced-motion:reduce){
   *,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important}
 }
@@ -238,6 +386,12 @@ footer{text-align:center;padding:18px 12px 28px;color:#d7c99e;font:13px Arial,sa
           <strong>A Mikulás 🎅</strong>
           <span style="font-size:12px;color:#c8b77e">Északi-sarki posta</span>
         </div>
+      </div>
+
+      <div class="print-button-wrap">
+        <button id="printLetterBtn" type="button">
+          🖨️ Levél nyomtatása
+        </button>
       </div>
 
       <div id="readerAudioBox" class="media-card hidden">
@@ -346,6 +500,11 @@ function setBusy(value) {
   $("saveBtn").disabled = value;
   $("saveBtn").textContent = value ? "Mentés folyamatban..." : "💾 Levél mentése";
 }
+
+/* Nyomtatás gombja */
+$("printLetterBtn").addEventListener("click", () => {
+  window.print();
+});
 
 $("showLoginBtn").addEventListener("click", () => {
   $("loginPanel").dataset.open = "yes";
