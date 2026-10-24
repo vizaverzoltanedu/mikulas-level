@@ -3,220 +3,216 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>A Mikulás személyes levele</title>
-
+<title>Mikuláslevelek – Admin</title>
 <style>
-* {
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-  font-family: Georgia, serif;
-  color: #3b241b;
-  background: #f5ead6;
-}
-
-header {
-  text-align: center;
-  padding: 40px 15px;
-  color: #fff0d0;
-  background: linear-gradient(135deg, #12384b, #8d101c);
-}
-
-h1 {
-  font-size: clamp(30px, 6vw, 48px);
-}
-
-main {
-  max-width: 850px;
-  margin: 25px auto;
-  padding: 15px;
-}
-
-.card {
-  padding: 25px;
-  background: #fffaf0;
-  border: 2px solid #c99b5a;
-  border-radius: 18px;
-  box-shadow: 0 8px 24px #48200f22;
-}
-
-h2 {
-  color: #9b1520;
-}
-
-.letter {
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-  line-height: 1.9;
-  font-size: 19px;
-  padding: 22px;
-  background: white;
-  border-left: 4px solid #d6ad64;
-  border-radius: 8px;
-}
-
-.video {
-  margin-top: 25px;
-  padding: 18px;
-  text-align: center;
-  background: white;
-  border-radius: 12px;
-}
-
-.placeholder {
-  padding: 30px 10px;
-  color: white;
-  background: linear-gradient(135deg, #17384b, #8d101c);
-  border-radius: 10px;
-}
-
-.santa {
-  font-size: 75px;
-}
-
-video {
-  width: 100%;
-  max-height: 450px;
-}
-
-footer {
-  text-align: center;
-  padding: 25px;
-  background: #690d16;
-  color: #ffe9bc;
-}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f4eee4;color:#263238}
+header{background:#a81728;color:white;text-align:center;padding:24px 12px}
+main{max-width:800px;margin:25px auto;padding:12px}
+section{background:white;padding:20px;margin-bottom:20px;border-radius:12px}
+input,textarea,button{display:block;width:100%;padding:12px;margin:10px 0;font-size:16px}
+textarea{min-height:160px}
+button{background:#176b45;color:white;border:0;border-radius:7px;cursor:pointer}
+.item{border:1px solid #ddd;border-radius:8px;padding:15px;margin:12px 0}
+a{overflow-wrap:anywhere}
+.hidden{display:none}
+.letter{white-space:pre-wrap;line-height:1.8}
 </style>
 </head>
-
 <body>
 
 <header>
-  <div>❄ Üzenet az Északi-sarkról ❄</div>
-  <h1>🎅 A Mikulás levele 🎄</h1>
-  <p>Egy különleges, személyes meglepetés!</p>
+<h1>🎅 A Mikulás személyes levelei 🎄</h1>
+<p>Adminisztrációs felület</p>
 </header>
 
 <main>
-  <section class="card">
 
-    <h2 id="koszontes">A Mikulás üzenete</h2>
+<section id="login">
+<h2>🔐 Admin belépés</h2>
+<input id="jelszo" type="password" placeholder="Admin jelszó">
+<button onclick="belepes()">Belépés</button>
+<p id="hiba"></p>
+</section>
 
-    <div id="level" class="letter">
-      A Mikulás levele hamarosan megérkezik.
-    </div>
+<div id="admin" class="hidden">
 
-    <div class="video">
-      <h2>🎬 A Mikulás videóüzenete</h2>
+<section>
+<h2>🎁 Új Mikulás-levél</h2>
 
-      <div id="videoHely" class="placeholder">
-        <div class="santa">🎅</div>
-        <strong>Üdvözlet az Északi-sarkról!</strong>
-        <p>A Mikulás videója itt jelenhet meg.</p>
-      </div>
+<label for="nev">Megajándékozott neve</label>
+<input id="nev" placeholder="Például: Bence">
 
-      <video
-        id="mikulasVideo"
-        controls
-        playsinline
-        hidden>
-      </video>
-    </div>
+<label for="uzenet">Személyes levél</label>
+<textarea id="uzenet" placeholder="Írd ide a levelet..."></textarea>
 
-  </section>
+<label for="video">Videó linkje (nem kötelező)</label>
+<input id="video" placeholder="https://...">
+
+<button onclick="mentes()">Levél mentése</button>
+<p id="eredmeny"></p>
+</section>
+
+<section>
+<h2>📜 Korábbi levelek</h2>
+<div id="lista"></div>
+</section>
+
+</div>
+
+<section id="olvaso" class="hidden">
+<h2>🎅 Személyes Mikulás-levél</h2>
+<h3 id="olvasoNev"></h3>
+<p id="olvasoLevel" class="letter"></p>
+<a id="olvasoVideo" target="_blank" rel="noopener noreferrer"></a>
+</section>
+
 </main>
 
-<footer>
-  ❄ Kellemes ünnepeket kíván a Mikulás! ❄
-</footer>
-
 <script>
-/*
-  AJÁNDÉKOZÓI BEÁLLÍTÁS
+const KULCS="mikulas_levelek_v1";
+const ADMIN_JELSZO="Mikulas2026!";
+let szerkesztettId=null;
 
-  A neveket és a leveleket TE írod be.
-  A megajándékozottnak nincs névbeviteli mezője.
-
-  Minden személyhez külön azonosító tartozik.
-  A régi bejegyzéseket hagyd meg,
-  ha a régi QR-kódokat is használni szeretnéd.
-*/
-
-const AJANDEKOK = {
-
-  "csomag1": {
-    nev: "IDE ÍRD AZ ELSŐ SZEMÉLY NEVÉT",
-
-    level: `Kedves IDE ÍRD A NEVÉT!
-
-A Mikulás idén is szeretne neked
-egy különleges meglepetést küldeni.
-
-IDE ÍRD A SZEMÉLYES LEVELET!
-
-Kívánok neked sok örömet,
-boldogságot és csodás ünnepeket!
-
-Szeretettel:
-A Mikulás 🎅`,
-
-    video: ""
-  },
-
-  "csomag2": {
-    nev: "IDE ÍRD A MÁSODIK SZEMÉLY NEVÉT",
-
-    level: `Kedves IDE ÍRD A NEVÉT!
-
-Ez a levél csak neked készült.
-
-IDE ÍRD A MÁSODIK SZEMÉLY LEVELÉT!
-
-Kellemes Mikulás-napot kívánok!
-
-Szeretettel:
-A Mikulás 🎅`,
-
-    video: ""
-  }
-
-};
-
-const parameterek = new URLSearchParams(location.search);
-const azonosito = parameterek.get("ajandek");
-const adat = azonosito ? AJANDEKOK[azonosito] : null;
-
-if (adat) {
-
-  document.getElementById("koszontes").textContent =
-    "Kedves " + adat.nev + "!";
-
-  document.getElementById("level").textContent =
-    adat.level;
-
-  if (adat.video && adat.video.trim() !== "") {
-
-    const video = document.getElementById("mikulasVideo");
-
-    video.src = adat.video;
-    video.hidden = false;
-
-    document.getElementById("videoHely").hidden = true;
-  }
-
-} else {
-
-  document.getElementById("koszontes").textContent =
-    "🎅 A Mikulás üzenete";
-
-  document.getElementById("level").textContent =
-    "Ez a Mikulás-levél nem található. " +
-    "Ellenőrizd a QR-kódot!";
-
-  document.querySelector(".video").hidden = true;
-
+function betolt(){
+ try{return JSON.parse(localStorage.getItem(KULCS)||"[]")}
+ catch(e){return []}
 }
+
+function tarol(adatok){
+ localStorage.setItem(KULCS,JSON.stringify(adatok));
+}
+
+function belepes(){
+ if(document.getElementById("jelszo").value===ADMIN_JELSZO){
+  document.getElementById("login").classList.add("hidden");
+  document.getElementById("admin").classList.remove("hidden");
+  listaFrissit();
+ }else{
+  document.getElementById("hiba").textContent="Hibás jelszó!";
+ }
+}
+
+function link(id){
+ return location.origin+location.pathname+"?level="+encodeURIComponent(id);
+}
+
+function mentes(){
+ const nev=document.getElementById("nev").value.trim();
+ const uzenet=document.getElementById("uzenet").value.trim();
+ const video=document.getElementById("video").value.trim();
+
+ if(!nev||!uzenet){
+  alert("Töltsd ki a nevet és a levelet!");
+  return;
+ }
+
+ const adatok=betolt();
+
+ if(szerkesztettId){
+  const level=adatok.find(x=>x.id===szerkesztettId);
+  if(level){
+   level.nev=nev;
+   level.uzenet=uzenet;
+   level.video=video;
+  }
+  szerkesztettId=null;
+ }else{
+  const id=crypto.randomUUID
+   ?crypto.randomUUID()
+   :Date.now().toString(36)+Math.random().toString(36).slice(2);
+
+  adatok.push({id,nev,uzenet,video});
+ }
+
+ tarol(adatok);
+
+ document.getElementById("nev").value="";
+ document.getElementById("uzenet").value="";
+ document.getElementById("video").value="";
+ document.getElementById("eredmeny").textContent="A levél mentve.";
+
+ listaFrissit();
+}
+
+function listaFrissit(){
+ const lista=document.getElementById("lista");
+ lista.replaceChildren();
+
+ betolt().forEach(level=>{
+  const elem=document.createElement("div");
+  elem.className="item";
+
+  const cim=document.createElement("strong");
+  cim.textContent=level.nev;
+
+  const a=document.createElement("a");
+  a.href=link(level.id);
+  a.textContent="Személyes levél megnyitása";
+  a.target="_blank";
+  a.style.display="block";
+
+  const qr=document.createElement("a");
+  qr.href="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data="+encodeURIComponent(link(level.id));
+  qr.textContent="QR-kód megnyitása";
+  qr.target="_blank";
+  qr.style.display="block";
+
+  const edit=document.createElement("button");
+  edit.textContent="Szerkesztés";
+  edit.onclick=()=>{
+   document.getElementById("nev").value=level.nev;
+   document.getElementById("uzenet").value=level.uzenet;
+   document.getElementById("video").value=level.video||"";
+   szerkesztettId=level.id;
+   window.scrollTo({top:0,behavior:"smooth"});
+  };
+
+  const torol=document.createElement("button");
+  torol.textContent="Törlés";
+  torol.style.background="#a81728";
+  torol.onclick=()=>{
+   if(confirm("Biztosan törlöd ezt a levelet?")){
+    tarol(betolt().filter(x=>x.id!==level.id));
+    listaFrissit();
+   }
+  };
+
+  elem.append(cim,a,qr,edit,torol);
+  lista.appendChild(elem);
+ });
+}
+
+function levelMegnyit(){
+ const id=new URLSearchParams(location.search).get("level");
+ if(!id)return;
+
+ document.getElementById("login").classList.add("hidden");
+ document.getElementById("admin").classList.add("hidden");
+ document.getElementById("olvaso").classList.remove("hidden");
+
+ const level=betolt().find(x=>x.id===id);
+
+ document.getElementById("olvasoNev").textContent=
+  level?"Kedves "+level.nev+"!":"A levél nem található";
+
+ document.getElementById("olvasoLevel").textContent=
+  level?level.uzenet:"Ez a levél ebben a böngészőben nem található.";
+
+ const video=document.getElementById("olvasoVideo");
+
+ if(level&&level.video){
+  try{
+   const url=new URL(level.video);
+   if(url.protocol==="https:"||url.protocol==="http:"){
+    video.href=url.href;
+    video.textContent="🎬 Mikulás-videó megtekintése";
+   }
+  }catch(e){}
+ }
+}
+
+levelMegnyit();
 </script>
 
 </body>
