@@ -300,10 +300,12 @@ function letterIdFromHash(){const match=location.hash.match(/^#level=([0-9a-f-]{
    It is not parsed as UTC, preventing a one-day timezone shift. */
 function formatDate(value){
   if(!value)return "";
-  const match=String(value).match(/^(\d{4})-(\d{2})-(\d{2})$/);
-  if(match)return match[3]+"."+match[2]+"."+match[1]+".";
-  const date=new Date(value);
-  return Number.isNaN(date.getTime())?String(value):date.toLocaleDateString("hu-HU");
+  const s=String(value).trim();
+  const match=s.match(/^(\d{4})-(\d{2})-(\d{2})(?:$|T|\s)/);
+  if(match)return `${match[1]}-${match[2]}-${match[3]}`;
+  const hu=s.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})\.?$/);
+  if(hu)return `${hu[3]}-${hu[2].padStart(2,"0")}-${hu[1].padStart(2,"0")}`;
+  return s;
 }
 
 function makeElement(tag,className,text){
