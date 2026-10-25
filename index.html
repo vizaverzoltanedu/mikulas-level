@@ -281,16 +281,26 @@ async function finishMfa(factorId,code){
   setPage();
 }
 
+/*
+ * MFA-javítás:
+ * - először minden elérhető faktort megnéz;
+ * - a már ellenőrzött faktort soha nem törli;
+ * - csak a befejezetlen TOTP-faktort távolítja el;
+ * - a QR-kódot az új enroll válaszából jeleníti meg.
+ */
 async function prepareMfa(){
   if(mfaPreparing||!currentSession?.user)return;
+
   mfaPreparing=true;
   mfaVerified=false;
   setPage();
   clearMessage("mfaStatus");
   show("mfaSetupArea",false);
   $("mfaCode").value="";
+
   try{
-    const {data:aalData,error:aalError}=await db.auth.mfa.getAuthenticatorAssuranceLevel();
+    const {data:aalData,error:aalError}=
+      await db.auth.mfa.getAuthenticatorAssuranceLevel();
     if(aalError)throw aalError;
 
     if(aalData?.currentLevel==="aal2"){
@@ -302,39 +312,80 @@ async function prepareMfa(){
     const {data,error}=await db.auth.mfa.listFactors();
     if(error)throw error;
 
-    const verified=(data?.totp||[]).find(f=>f.status==="verified");
+    const allFactors=Array.isArray(data?.all)?data.all:[];
+    const totpFactors=Array.isArray(data?.totp)?data.totp:[];
+    const factors=allFactors.length
+      ?allFactors
+      :totpFactors;
+
+    const verified=factors.find(f=>
+      (f.factor_type==="totp"||totpFactors.some(t=>t.id===f.id))
+      &&f.status==="verified"
+    );
+
     if(verified){
       mfaFactorId=verified.id;
       mfaMode="verify";
-      $("mfaInstruction").textContent="Nyisd meg a hitelesítőalkalmazást, és írd be az ehhez a fiókhoz tartozó hatjegyű kódot.";
+      $("mfaInstruction").textContent=
+        "Nyisd meg a hitelesítőalkalmazást, és írd be az ehhez a fiókhoz tartozó hatjegyű kódot.";
       $("mfaSubmit").textContent="Kód ellenőrzése";
       show("mfaSetupArea",false);
       setPage();
       return;
     }
 
-    const pending=(data?.totp||[]).find(f=>f.status!=="verified");
+    const pending=factors.find(f=>
+      (f.factor_type==="totp"||totpFactors.some(t=>t.id===f.id))
+      &&f.status==="unverified"
+    );
+
     if(pending){
-      throw new Error("Ehhez a fiókhoz már tartozik be nem fejezett hitelesítőalkalmazás-beállítás. A Supabase Dashboardban az Authentication → Users résznél nyisd meg a felhasználót, távolítsd el a régi, be nem fejezett MFA-faktort, majd jelentkezz be újra.");
+      const {error:removeError}=await db.auth.mfa.unenroll({
+        factorId:pending.id
+      });
+      if(removeError){
+        throw new Error(
+          "A korábbi, befejezetlen hitelesítést nem sikerült eltávolítani. "+
+          removeError.message
+        );
+      }
     }
 
-    const {data:enrollData,error:enrollError}=await db.auth.mfa.enroll({
-      factorType:"totp",
-      friendlyName:"Mikulás admin"
-    });
+    const {data:enrollData,error:enrollError}=
+      await db.auth.mfa.enroll({
+        factorType:"totp",
+        friendlyName:"Mikulás admin"
+      });
+
     if(enrollError)throw enrollError;
-    if(!enrollData?.id||!enrollData?.totp?.qr_code)throw new Error("A Supabase nem adott vissza QR-kódot.");
+
+    if(!enrollData?.id||!enrollData?.totp?.qr_code){
+      throw new Error("A Supabase nem adott vissza QR-kódot.");
+    }
 
     mfaFactorId=enrollData.id;
     mfaMode="enroll";
-    $("mfaInstruction").textContent="Első alkalommal állítsd be a hitelesítőalkalmazást a QR-kóddal. Ezután írd be az alkalmazás által mutatott hatjegyű kódot a beállítás megerősítéséhez.";
-    $("mfaQr").src="data:image/svg+xml;charset=UTF-8,"+encodeURIComponent(enrollData.totp.qr_code);
-    $("mfaSecret").textContent="Kézi beállítási kulcs: "+enrollData.totp.secret;
+
+    $("mfaInstruction").textContent=
+      "Olvasd be a QR-kódot a Google Authenticator vagy a Microsoft Authenticator alkalmazással, majd írd be a hatjegyű kódot.";
+
+    $("mfaQr").src=
+      "data:image/svg+xml;charset=UTF-8,"+
+      encodeURIComponent(enrollData.totp.qr_code);
+
+    $("mfaSecret").textContent=
+      "Kézi beállítási kulcs: "+enrollData.totp.secret;
+
     $("mfaSubmit").textContent="Beállítás megerősítése";
     show("mfaSetupArea",true);
     setPage();
+
   }catch(error){
-    message("mfaStatus","A kétlépcsős hitelesítés előkészítése nem sikerült: "+(error.message||"Ismeretlen hiba"));
+    message(
+      "mfaStatus",
+      "A kétlépcsős hitelesítés előkészítése nem sikerült: "+
+      (error.message||"Ismeretlen hiba")
+    );
     show("mfaPanel",true);
   }finally{
     mfaPreparing=false;
@@ -345,10 +396,12 @@ $("mfaForm").addEventListener("submit",async event=>{
   event.preventDefault();
   clearMessage("mfaStatus");
   const code=$("mfaCode").value.trim();
+
   if(!/^\d{6}$/.test(code)){
     message("mfaStatus","Pontosan hat számjegyű kódot írj be.");
     return;
   }
+
   if(!mfaFactorId){
     message("mfaStatus","Nem található a hitelesítési faktor. Jelentkezz ki, majd próbálj újra belépni.");
     return;
@@ -358,15 +411,20 @@ $("mfaForm").addEventListener("submit",async event=>{
   try{
     await finishMfa(mfaFactorId,code);
   }catch(error){
-    message("mfaStatus","A kód ellenőrzése nem sikerült: "+(error.message||"Ellenőrizd a kódot, majd próbáld újra."));
+    message(
+      "mfaStatus",
+      "A kód ellenőrzése nem sikerült: "+
+      (error.message||"Ellenőrizd a kódot, majd próbáld újra.")
+    );
   }finally{
     $("mfaSubmit").disabled=false;
   }
 });
 
 async function logout(){
-  try{await db.auth.signOut();}
-  finally{
+  try{
+    await db.auth.signOut();
+  }finally{
     currentSession=null;
     mfaVerified=false;
     mfaFactorId=null;
@@ -385,6 +443,7 @@ $("logoutBtn").addEventListener("click",logout);
 $("loginForm").addEventListener("submit",async event=>{
   event.preventDefault();
   clearMessage("loginStatus");
+
   const identifier=$("loginIdentifier").value.trim();
   const password=$("password").value;
 
@@ -394,7 +453,10 @@ $("loginForm").addEventListener("submit",async event=>{
   }
 
   try{
-    const {data,error}=await db.functions.invoke("username-login",{body:{identifier,password}});
+    const {data,error}=await db.functions.invoke(
+      "username-login",
+      {body:{identifier,password}}
+    );
     if(error)throw error;
 
     if(data?.session?.access_token&&data?.session?.refresh_token){
@@ -410,7 +472,10 @@ $("loginForm").addEventListener("submit",async event=>{
       });
       if(setError)throw setError;
     }else{
-      throw new Error(data?.message||"A username-login funkció nem adott vissza érvényes munkamenetet.");
+      throw new Error(
+        data?.message||
+        "A username-login Edge Function nem adott vissza érvényes munkamenetet."
+      );
     }
 
     $("password").value="";
@@ -419,20 +484,28 @@ $("loginForm").addEventListener("submit",async event=>{
     mfaVerified=false;
     setPage();
     await prepareMfa();
+
   }catch(error){
-    message("loginStatus","Nem sikerült belépni: "+(error.message||"Ellenőrizd az adatokat és a username-login Edge Function beállítását."));
+    message(
+      "loginStatus",
+      "Nem sikerült belépni: "+
+      (error.message||"Ellenőrizd az adatokat és a username-login Edge Function beállítását.")
+    );
   }
 });
 
 db.auth.onAuthStateChange((event,session)=>{
   currentSession=session;
+
   if(!session){
     mfaVerified=false;
     mfaFactorId=null;
     setPage();
     return;
   }
+
   setPage();
+
   if(event==="SIGNED_IN"||event==="INITIAL_SESSION"){
     Promise.resolve().then(()=>prepareMfa());
   }
@@ -442,25 +515,48 @@ async function uploadMedia(file,kind){
   if(!file)return null;
 
   const allowedByKind={
-    audio:{types:["audio/mpeg","audio/mp3","audio/mp4","audio/x-m4a","audio/wav","audio/x-wav","audio/ogg","audio/aac"],extensions:/\.(mp3|m4a|wav|ogg|aac)$/i,message:"Hangfájlt válassz (MP3, M4A, WAV vagy OGG)."},
-    video:{types:["video/mp4","video/webm","video/quicktime"],extensions:/\.(mp4|webm|mov)$/i,message:"Videófájlt válassz (MP4, WebM vagy MOV)."},
-    certificate:{types:["application/pdf","image/png","image/jpeg"],extensions:/\.(pdf|png|jpg|jpeg)$/i,message:"Az oklevél PDF, PNG vagy JPG fájl legyen."}
+    audio:{
+      types:["audio/mpeg","audio/mp3","audio/mp4","audio/x-m4a","audio/wav","audio/x-wav","audio/ogg","audio/aac"],
+      extensions:/\.(mp3|m4a|wav|ogg|aac)$/i,
+      message:"Hangfájlt válassz (MP3, M4A, WAV vagy OGG)."
+    },
+    video:{
+      types:["video/mp4","video/webm","video/quicktime"],
+      extensions:/\.(mp4|webm|mov)$/i,
+      message:"Videófájlt válassz (MP4, WebM vagy MOV)."
+    },
+    certificate:{
+      types:["application/pdf","image/png","image/jpeg"],
+      extensions:/\.(pdf|png|jpg|jpeg)$/i,
+      message:"Az oklevél PDF, PNG vagy JPG fájl legyen."
+    }
   };
 
   const rule=allowedByKind[kind];
   if(!rule)throw new Error("Ismeretlen fájltípus.");
-  if(file.type&&!rule.types.includes(file.type)&&!rule.extensions.test(file.name))throw new Error(rule.message);
-  if(kind==="certificate"&&file.size>15*1024*1024)throw new Error("Az oklevél legfeljebb 15 MB méretű lehet.");
+
+  if(file.type&&!rule.types.includes(file.type)&&!rule.extensions.test(file.name)){
+    throw new Error(rule.message);
+  }
+
+  if(kind==="certificate"&&file.size>15*1024*1024){
+    throw new Error("Az oklevél legfeljebb 15 MB méretű lehet.");
+  }
 
   const path=kind+"/"+crypto.randomUUID()+"-"+escapeFileName(file.name);
-  const {error}=await db.storage.from(BUCKET).upload(path,file,{cacheControl:"3600",upsert:false,contentType:file.type||undefined});
+  const {error}=await db.storage.from(BUCKET).upload(
+    path,file,
+    {cacheControl:"3600",upsert:false,contentType:file.type||undefined}
+  );
   if(error)throw error;
+
   return db.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
 }
 
 $("letterForm").addEventListener("submit",async event=>{
   event.preventDefault();
   if(busy)return;
+
   if(!isAdmin()){
     message("adminStatus","A mentéshez adminisztrátorként be kell jelentkezned, és a kétlépcsős hitelesítést is el kell végezned.");
     return;
@@ -473,7 +569,10 @@ $("letterForm").addEventListener("submit",async event=>{
     const id=$("letterId").value;
     const name=$("nev").value.trim();
     const letter=$("uzenet").value.trim();
-    if(!name||!letter)throw new Error("Add meg a címzett nevét és a levelet is.");
+
+    if(!name||!letter){
+      throw new Error("Add meg a címzett nevét és a levelet is.");
+    }
 
     let audioUrl=currentLetter?.hang_url||null;
     let videoUrl=currentLetter?.video_url||null;
@@ -504,9 +603,11 @@ $("letterForm").addEventListener("submit",async event=>{
       :await db.from(TABLE).insert(record).select().single();
 
     if(result.error)throw result.error;
+
     message("adminStatus","Sikeresen elmentve! A levél egyedi QR-kódja a listában található.");
     resetForm();
     await loadLetters();
+
   }catch(error){
     message("adminStatus","Hiba történt: "+(error.message||"Ismeretlen hiba"));
   }finally{
@@ -530,13 +631,17 @@ $("refreshBtn").addEventListener("click",loadLetters);
 
 async function loadLetters(){
   if(!isAdmin())return;
+
   $("letterList").textContent="Levelek betöltése...";
   const {data,error}=await db.from(TABLE).select("*").order("letrehozva",{ascending:false});
+
   if(error){
     $("letterList").textContent="Nem sikerült betölteni a leveleket: "+error.message;
     return;
   }
+
   $("letterList").replaceChildren();
+
   if(!data.length){
     $("letterList").textContent="Még nincs elmentett levél. Készítsd el az elsőt fent!";
     return;
@@ -545,54 +650,74 @@ async function loadLetters(){
   for(const item of data){
     const entry=document.createElement("div");
     entry.className="entry";
+
     const title=document.createElement("h3");
     title.textContent="🎁 "+item.nev;
     entry.appendChild(title);
 
     const date=document.createElement("p");
     date.className="small";
-    date.textContent=item.datum?formatDate(item.datum):(item.letrehozva?new Date(item.letrehozva).toLocaleString("hu-HU"):"");
+    date.textContent=item.datum
+      ?formatDate(item.datum)
+      :(item.letrehozva?new Date(item.letrehozva).toLocaleString("hu-HU"):"");
     entry.appendChild(date);
 
     const link=publicLetterUrl(item.id);
     const open=document.createElement("a");
-    open.href=link;open.textContent="A levél megnyitása";open.target="_blank";open.rel="noopener";
+    open.href=link;
+    open.textContent="A levél megnyitása";
+    open.target="_blank";
+    open.rel="noopener";
     entry.appendChild(open);
 
     const qr=document.createElement("img");
-    qr.className="qr";qr.alt="QR-kód: "+item.nev;qr.loading="lazy";
+    qr.className="qr";
+    qr.alt="QR-kód: "+item.nev;
+    qr.loading="lazy";
     qr.src="https://api.qrserver.com/v1/create-qr-code/?size=350x350&data="+encodeURIComponent(link);
     entry.appendChild(qr);
 
     const copy=document.createElement("button");
     copy.textContent="Hivatkozás másolása";
     copy.addEventListener("click",async()=>{
-      try{await navigator.clipboard.writeText(link);copy.textContent="Másolva!";}
-      catch{window.prompt("Másold ki ezt a hivatkozást:",link);}
+      try{
+        await navigator.clipboard.writeText(link);
+        copy.textContent="Másolva!";
+      }catch{
+        window.prompt("Másold ki ezt a hivatkozást:",link);
+      }
     });
     entry.appendChild(copy);
 
     if(item.oklevel_url){
       const certLink=document.createElement("a");
-      certLink.href=item.oklevel_url;certLink.textContent="🏅 Oklevél megnyitása";certLink.target="_blank";certLink.rel="noopener";certLink.style.display="block";
+      certLink.href=item.oklevel_url;
+      certLink.textContent="🏅 Oklevél megnyitása";
+      certLink.target="_blank";
+      certLink.rel="noopener";
+      certLink.style.display="block";
       entry.appendChild(certLink);
     }
 
     const edit=document.createElement("button");
-    edit.className="secondary";edit.textContent="Szerkesztés";
+    edit.className="secondary";
+    edit.textContent="Szerkesztés";
     edit.addEventListener("click",()=>editLetter(item));
     entry.appendChild(edit);
 
     const del=document.createElement("button");
-    del.className="danger";del.textContent="Törlés";
+    del.className="danger";
+    del.textContent="Törlés";
     del.addEventListener("click",()=>deleteLetter(item));
     entry.appendChild(del);
+
     $("letterList").appendChild(entry);
   }
 }
 
 function editLetter(item){
   if(!isAdmin())return;
+
   currentLetter=item;
   $("letterId").value=item.id;
   $("nev").value=item.nev||"";
@@ -604,9 +729,17 @@ function editLetter(item){
   $("audioFile").value="";
   $("videoFile").value="";
   $("certificateFile").value="";
-  $("currentAudio").textContent=item.hang_url?"Jelenlegi hangfelvétel megmarad, ha nem választasz újat.":"Nincs jelenlegi hangfelvétel.";
-  $("currentVideo").textContent=item.video_url?"Jelenlegi videó megmarad, ha nem választasz újat.":"Nincs jelenlegi videó.";
-  $("currentCertificate").textContent=item.oklevel_url?"Jelenlegi oklevél megmarad, ha nem választasz újat.":"Nincs jelenlegi oklevél.";
+
+  $("currentAudio").textContent=item.hang_url
+    ?"Jelenlegi hangfelvétel megmarad, ha nem választasz újat."
+    :"Nincs jelenlegi hangfelvétel.";
+  $("currentVideo").textContent=item.video_url
+    ?"Jelenlegi videó megmarad, ha nem választasz újat."
+    :"Nincs jelenlegi videó.";
+  $("currentCertificate").textContent=item.oklevel_url
+    ?"Jelenlegi oklevél megmarad, ha nem választasz újat."
+    :"Nincs jelenlegi oklevél.";
+
   $("formTitle").textContent="Levél szerkesztése: "+item.nev;
   show("cancelEditBtn",true);
   window.scrollTo({top:0,behavior:"smooth"});
@@ -615,11 +748,14 @@ function editLetter(item){
 async function deleteLetter(item){
   if(!isAdmin())return;
   if(!confirm("Biztosan törlöd ezt a levelet: "+item.nev+"?"))return;
+
   const {error}=await db.from(TABLE).delete().eq("id",item.id);
+
   if(error){
     message("adminStatus","Nem sikerült törölni: "+error.message);
     return;
   }
+
   message("adminStatus","A levél törölve lett az adatbázisból. A feltöltött fájlok a tárhelyen megmaradhatnak.");
   await loadLetters();
 }
@@ -627,9 +763,12 @@ async function deleteLetter(item){
 function resetReaderMedia(){
   const audio=$("readerAudio");
   const video=$("readerVideo");
-  audio.pause();video.pause();
-  audio.removeAttribute("src");video.removeAttribute("src");
-  audio.load();video.load();
+  audio.pause();
+  video.pause();
+  audio.removeAttribute("src");
+  video.removeAttribute("src");
+  audio.load();
+  video.load();
   $("readerCertificateImage").removeAttribute("src");
   $("readerCertificateOpen").removeAttribute("href");
   $("readerCertificateDownload").removeAttribute("href");
@@ -647,7 +786,9 @@ async function loadPublicLetter(id){
   resetReaderMedia();
 
   const {data,error}=await db.from(TABLE).select("*").eq("id",id).maybeSingle();
+
   if(displayedPublicId!==id)return;
+
   if(error||!data){
     message("readerStatus","Ez a levél nem található. Ellenőrizd a QR-kódot vagy a hivatkozást.");
     return;
@@ -655,6 +796,7 @@ async function loadPublicLetter(id){
 
   safeText($("readerGreeting"),"Kedves "+data.nev+"!");
   safeText($("readerLetter"),data.level);
+
   const extras=[
     data.dicseret?"⭐ Személyes dicséret\n"+data.dicseret:"",
     data.kedvenc_elfoglaltsag?"🎨 Amit szeretsz\n"+data.kedvenc_elfoglaltsag:"",
@@ -664,9 +806,11 @@ async function loadPublicLetter(id){
   const personal=$("readerPersonalization");
   personal.replaceChildren();
   personal.classList.toggle("hidden",extras.length===0);
+
   for(const extra of extras){
     const p=document.createElement("div");
-    p.className="personal-note";p.textContent=extra;
+    p.className="personal-note";
+    p.textContent=extra;
     personal.appendChild(p);
   }
 
@@ -677,17 +821,29 @@ async function loadPublicLetter(id){
 
   const audio=$("readerAudio");
   const video=$("readerVideo");
+
   show("readerAudioBox",!!data.hang_url);
-  if(data.hang_url){audio.src=data.hang_url;audio.load();}
+  if(data.hang_url){
+    audio.src=data.hang_url;
+    audio.load();
+  }
+
   show("readerVideoBox",!!data.video_url);
-  if(data.video_url){video.src=data.video_url;video.load();}
+  if(data.video_url){
+    video.src=data.video_url;
+    video.load();
+  }
 
   show("readerCertificateBox",!!data.oklevel_url);
   if(data.oklevel_url){
     const url=data.oklevel_url;
     $("readerCertificateOpen").href=url;
     $("readerCertificateDownload").href=url;
-    $("readerCertificateDownload").setAttribute("download","mikulas-oklevel-"+(data.nev||"gyermek").replace(/[^\p{L}\p{N}-]+/gu,"-"));
+    $("readerCertificateDownload").setAttribute(
+      "download",
+      "mikulas-oklevel-"+(data.nev||"gyermek").replace(/[^\p{L}\p{N}-]+/gu,"-")
+    );
+
     if(/\.(png|jpe?g)(?:[?#]|$)/i.test(url)){
       $("readerCertificateImage").src=url;
       show("readerCertificateImage",true);
@@ -696,10 +852,12 @@ async function loadPublicLetter(id){
 }
 
 $("printLetterBtn").addEventListener("click",()=>window.print());
+
 $("openEnvelopeBtn").addEventListener("click",()=>{
   $("envelopeStage").classList.add("opening");
   $("openEnvelopeBtn").disabled=true;
   const reduced=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
   window.setTimeout(()=>{
     show("envelopeStage",false);
     show("readerContent",true);
@@ -712,32 +870,40 @@ window.addEventListener("hashchange",setPage);
 
 function startSnow(){
   if(window.matchMedia("(prefers-reduced-motion: reduce)").matches)return;
+
   const symbols=["❄","❅","✦","❆"];
+
   function flake(){
     const el=document.createElement("span");
     el.className="snowflake";
     el.textContent=symbols[Math.floor(Math.random()*symbols.length)];
     el.style.left=Math.random()*100+"vw";
     el.style.fontSize=(10+Math.random()*14)+"px";
+
     const duration=7+Math.random()*9;
     el.style.animationDuration=duration+"s";
     document.body.appendChild(el);
     setTimeout(()=>el.remove(),duration*1000);
   }
+
   for(let i=0;i<16;i++)setTimeout(flake,i*250);
   setInterval(flake,650);
 }
 
 (async function init(){
   startSnow();
+
   const {data,error}=await db.auth.getSession();
+
   if(error){
     message("loginStatus","Nem sikerült ellenőrizni a belépési állapotot: "+error.message);
     setPage();
     return;
   }
+
   currentSession=data.session;
   setPage();
+
   if(currentSession?.user)await prepareMfa();
 })();
 </script>
