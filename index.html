@@ -82,7 +82,7 @@ footer{text-align:center;padding:18px 12px 28px;color:#d7c99e;font:13px Arial,sa
 @media print{
 @page{size:A4;margin:12mm}
 body{background:#fff!important;color:#241d17!important;overflow:visible}
-header,footer,#loginPanel,#adminPanel,#homePanel,#readerStatus,.print-button-wrap,.media-card,.certificate-card,.email-optin,.envelope-stage,.no-print{display:none!important}
+header,footer,#loginPanel,#adminPanel,#homePanel,#readerStatus,.print-button-wrap,.media-card,.certificate-card,.envelope-stage,.no-print{display:none!important}
 main{max-width:none;margin:0;padding:0}
 #readerPanel{display:block!important;background:#fff!important;border:0!important;box-shadow:none!important;padding:0!important;margin:0!important}
 #readerContent{display:block!important}
@@ -123,11 +123,9 @@ main{max-width:none;margin:0;padding:0}
 <form id="letterForm">
 <input type="hidden" id="letterId">
 <label for="nev">A címzett neve</label><input id="nev" maxlength="200" required placeholder="Például: Olivér">
-
 <label for="levelDatum">📅 A levél dátuma</label>
 <input id="levelDatum" type="date">
 <p class="small">Válaszd ki a dátumot a naptárból. A dátum a levélen is megjelenik.</p>
-
 <label for="uzenet">A Mikulás levele</label><textarea id="uzenet" required placeholder="Kedves Olivér!&#10;&#10;..."></textarea>
 <label for="dicseret">⭐ Személyes dicséret (nem kötelező)</label><textarea id="dicseret" maxlength="1000" placeholder="Például: Nagyon büszke vagyok rád..."></textarea>
 <label for="kedvenc">🎨 Kedvenc elfoglaltság (nem kötelező)</label><input id="kedvenc" maxlength="500" placeholder="Például: rajzolás, focizás">
@@ -174,19 +172,7 @@ main{max-width:none;margin:0;padding:0}
 <div id="readerCertificateBox" class="certificate-card hidden">
 <div class="certificate-icon">🏅</div><h3>A te különleges okleveled</h3><p>A Mikulás egy személyes oklevéllel is készült neked!</p>
 <img id="readerCertificateImage" class="certificate-preview hidden" alt="Személyes oklevél">
-<div><a id="readerCertificateOpen" href="#" target="_blank" rel="noopener"><button type="button">📜 Oklevél megnyitása</button></a> <a id="readerCertificateDownload" href="#" download><button type="button" class="secondary">⬇ Oklevél letöltése</button></a></div>
-</div>
-<div id="autoCertificateBox" class="certificate-card hidden">
-<div class="certificate-icon">🏅</div><h3>Automatikus névre szóló oklevél</h3><p id="autoCertificateText"></p>
-<button id="printCertificateBtn" type="button">🖨️ Oklevél nyomtatása / PDF mentése</button>
-</div>
-<div class="email-optin media-card">
-<h3>✉️ Kéred e-mailben is a leveledet?</h3>
-<p class="small">Csak akkor küldjük el, ha te ezt kifejezetten kéred és megadod az e-mail-címedet.</p>
-<label for="recipientEmail">E-mail-cím</label><input id="recipientEmail" type="email" placeholder="pelda@email.hu" autocomplete="email">
-<label style="display:flex;gap:10px;align-items:flex-start"><input id="emailConsent" type="checkbox" style="width:auto;margin-top:2px">Kifejezetten kérem, hogy a Mikulás-levelet elküldjék erre az e-mail-címre.</label>
-<button id="sendEmailBtn" type="button">✉️ Levél küldése e-mailben</button>
-<div id="emailStatus" class="status hidden"></div>
+<div><a id="readerCertificateOpen" href="#" target="_blank" rel="noopener">📜 Oklevél megnyitása</a> <a id="readerCertificateDownload" href="#" download>⬇ Oklevél letöltése</a></div>
 </div>
 </div>
 </section>
@@ -614,8 +600,6 @@ async function loadPublicLetter(id){
       :""
   );
 
-  safeText($("autoCertificateText"),data.nev+" részére, a Mikulás személyes elismerésével.");
-  show("autoCertificateBox",true);
   clearMessage("readerStatus");
   show("envelopeStage",true);
   show("readerContent",false);
@@ -667,85 +651,6 @@ $("openEnvelopeBtn").addEventListener("click",()=>{
     $("openEnvelopeBtn").disabled=false;
     $("envelopeStage").classList.remove("opening");
   },reduced?0:750);
-});
-
-$("printCertificateBtn").addEventListener("click",()=>{
-  const name=$("readerGreeting").textContent
-    .replace(/^Kedves\s*/,"")
-    .replace(/!$/,"");
-
-  const date=$("letterMeta").textContent
-    .replace(/^Kelt:\s*/,"")
-    .replace(/\s*·.*$/,"");
-
-  const cert=`<!DOCTYPE html><html lang="hu"><head><meta charset="UTF-8"><title>Mikulás-oklevél</title><style>@page{size:A4 landscape;margin:12mm}body{font-family:Georgia,serif;text-align:center;color:#573d20;background:#fffaf0;padding:25px;border:12px double #b89545}h1{font-size:38px;color:#8e2033;margin:18px}h2{font-size:28px;margin:25px}p{font-size:19px;line-height:1.7}.seal{border:3px dashed #b89545;border-radius:50%;padding:18px;display:inline-block;margin:20px;color:#8e2033;font:bold 13px Arial}</style></head><body><div style="font-size:50px">🎅 ✦ ❄ ✦ 🎄</div><h1>ÉSZAKI-SARKI ELISMERŐ OKLEVÉL</h1><p>Ez az oklevél szeretettel és ünnepi varázslattal készült</p><h2>${escapeHtml(name)}</h2><p>részére, a Mikulás személyes jókívánságával.<br>Legyen az ünneped örömteli, vidám és varázslatos!</p><div class="seal">ÉSZAKI-SARKI POSTA<br>HIVATALOS OKLEVÉL ✦</div><p>${escapeHtml(date)}</p><h2>A Mikulás 🎅</h2><script>window.onload=()=>window.print()<\/script></body></html>`;
-
-  const w=window.open("","_blank");
-
-  if(!w){
-    alert("A böngésző letiltotta a felugró ablakot. Engedélyezd az oldal számára, majd próbáld újra.");
-    return;
-  }
-
-  w.document.open();
-  w.document.write(cert);
-  w.document.close();
-});
-
-function escapeHtml(value){
-  return String(value??"").replace(/[&<>"']/g,ch=>({
-    "&":"&amp;",
-    "<":"&lt;",
-    ">":"&gt;",
-    '"':"&quot;",
-    "'":"&#39;"
-  }[ch]));
-}
-
-$("sendEmailBtn").addEventListener("click",async()=>{
-  clearMessage("emailStatus");
-
-  const email=$("recipientEmail").value.trim();
-
-  if(!$("emailConsent").checked){
-    return message("emailStatus","A küldéshez előbb jelöld be a kifejezett hozzájárulást.");
-  }
-
-  if(!email||!$("recipientEmail").checkValidity()){
-    return message("emailStatus","Adj meg egy érvényes e-mail-címet.");
-  }
-
-  if(!displayedPublicId){
-    return message("emailStatus","Nem található a levél azonosítója.");
-  }
-
-  $("sendEmailBtn").disabled=true;
-
-  try{
-    const {data,error}=await db.functions.invoke("send-letter-email",{
-      body:{
-        letter_id:displayedPublicId,
-        email,
-        consent:true
-      }
-    });
-
-    if(error)throw error;
-
-    message(
-      "emailStatus",
-      "A küldési kérelmet fogadtuk. "+
-      (data?.message||"Ha a levélküldő szolgáltatás be van állítva, a levél hamarosan megérkezik.")
-    );
-  }catch(error){
-    message(
-      "emailStatus",
-      "Az e-mail-küldés még nincs beállítva, vagy a szerver hibát jelzett. A biztonságos küldéshez Supabase Edge Function szükséges. Részletek: "+
-      (error.message||"ismeretlen hiba")
-    );
-  }finally{
-    $("sendEmailBtn").disabled=false;
-  }
 });
 
 window.addEventListener("hashchange",setPage);
