@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="hu">
 <head>
@@ -179,10 +180,6 @@ main{max-width:none;margin:0;padding:0}
 <img id="readerCertificateImage" class="certificate-preview hidden" alt="Személyes oklevél">
 <div><a id="readerCertificateOpen" href="#" target="_blank" rel="noopener"><button type="button">📜 Oklevél megnyitása</button></a> <a id="readerCertificateDownload" href="#" download><button type="button" class="secondary">⬇ Oklevél letöltése</button></a></div>
 </div>
-<div id="autoCertificateBox" class="certificate-card hidden">
-<div class="certificate-icon">🏅</div><h3>Automatikus névre szóló oklevél</h3><p id="autoCertificateText"></p>
-<button id="printCertificateBtn" type="button">🖨️ Oklevél nyomtatása / PDF mentése</button>
-</div>
 <div class="email-optin media-card">
 <h3>✉️ Kéred e-mailben is a leveledet?</h3>
 <p class="small">Csak akkor küldjük el, ha te ezt kifejezetten kéred és megadod az e-mail-címedet.</p>
@@ -350,8 +347,7 @@ const personal=$("readerPersonalization");personal.replaceChildren();personal.cl
 for(const extra of extras){const p=document.createElement("div");p.className="personal-note";p.textContent=extra;personal.appendChild(p)}
 const created=data.letrehozva?new Date(data.letrehozva):new Date();
 safeText($("letterMeta"),"Kiállítva: "+created.toLocaleDateString("hu-HU")+" · Északi-sarki levél");
-safeText($("autoCertificateText"),data.nev+" részére, a Mikulás személyes elismerésével.");
-show("autoCertificateBox",true);clearMessage("readerStatus");show("envelopeStage",true);show("readerContent",false);
+clearMessage("readerStatus");show("envelopeStage",true);show("readerContent",false);
 const audio=$("readerAudio"),video=$("readerVideo");
 show("readerAudioBox",!!data.hang_url);if(data.hang_url){audio.src=data.hang_url;audio.load()}
 show("readerVideoBox",!!data.video_url);if(data.video_url){video.src=data.video_url;video.load()}
@@ -370,17 +366,6 @@ const reduced=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 window.setTimeout(()=>{show("envelopeStage",false);show("readerContent",true);$("openEnvelopeBtn").disabled=false;$("envelopeStage").classList.remove("opening")},reduced?0:750)
 });
 
-$("printCertificateBtn").addEventListener("click",()=>{
-const name=$("readerGreeting").textContent.replace(/^Kedves\s*/,"").replace(/!$/,"");
-const date=$("letterMeta").textContent.replace(/^Kiállítva:\s*/,"");
-const cert=`<!DOCTYPE html><html lang="hu"><head><meta charset="UTF-8"><title>Mikulás-oklevél</title><style>@page{size:A4 landscape;margin:12mm}body{font-family:Georgia,serif;text-align:center;color:#573d20;background:#fffaf0;padding:25px;border:12px double #b89545}h1{font-size:38px;color:#8e2033;margin:18px}h2{font-size:28px;margin:25px}p{font-size:19px;line-height:1.7}.seal{border:3px dashed #b89545;border-radius:50%;padding:18px;display:inline-block;margin:20px;color:#8e2033;font:bold 13px Arial}</style></head><body><div style="font-size:50px">🎅 ✦ ❄ ✦ 🎄</div><h1>ÉSZAKI-SARKI ELISMERŐ OKLEVÉL</h1><p>Ez az oklevél szeretettel és ünnepi varázslattal készült</p><h2>${escapeHtml(name)}</h2><p>részére, a Mikulás személyes jókívánságával.<br>Legyen az ünneped örömteli, vidám és varázslatos!</p><div class="seal">ÉSZAKI-SARKI POSTA<br>HIVATALOS OKLEVÉL ✦</div><p>${escapeHtml(date)}</p><h2>A Mikulás 🎅</h2><script>window.onload=()=>window.print()<\/script></body></html>`;
-const w=window.open("","_blank");
-if(!w){alert("A böngésző letiltotta a felugró ablakot. Engedélyezd az oldal számára, majd próbáld újra.");return}
-w.document.open();w.document.write(cert);w.document.close()
-});
-
-function escapeHtml(value){return String(value??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]))}
-
 $("sendEmailBtn").addEventListener("click",async()=>{
 clearMessage("emailStatus");
 const email=$("recipientEmail").value.trim();
@@ -397,15 +382,23 @@ finally{$("sendEmailBtn").disabled=false}
 });
 
 $("inviteAdminBtn").addEventListener("click",async()=>{
-clearMessage("adminInviteStatus");const email=$("newAdminEmail").value.trim();
+clearMessage("adminInviteStatus");
+const email=$("newAdminEmail").value.trim();
 if(!isAdmin())return message("adminInviteStatus","Ehhez adminisztrátori belépés szükséges.");
 if(!email||!$("newAdminEmail").checkValidity())return message("adminInviteStatus","Adj meg egy érvényes e-mail-címet.");
 $("inviteAdminBtn").disabled=true;
 try{
 const {data,error}=await db.functions.invoke("manage-admins",{body:{action:"invite",email}});
-if(error)throw error;
-message("adminInviteStatus",data?.message||"A meghívási kérelem elküldve.");$("newAdminEmail").value=""
-}catch(error){message("adminInviteStatus","Az adminmeghívás szerveroldali Supabase-funkció nélkül nem működik. Részletek: "+(error.message||"ismeretlen hiba"))}
+if(error){
+const details=error.message||"Ismeretlen hiba";
+throw new Error("A Supabase manage-admins funkció nem érhető el. Ellenőrizd, hogy telepítve van-e, és hogy a neve pontosan manage-admins. Részletek: "+details);
+}
+if(data?.error)throw new Error(data.error);
+message("adminInviteStatus",data?.message||"A meghívási kérelem elküldve.");
+$("newAdminEmail").value="";
+}catch(error){
+message("adminInviteStatus",error.message||"Az adminmeghívás nem sikerült. Ellenőrizd a Supabase Edge Function beállításait.");
+}
 finally{$("inviteAdminBtn").disabled=false}
 });
 
