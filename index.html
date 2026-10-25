@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="hu">
 <head>
@@ -135,13 +136,7 @@ main{max-width:none;margin:0;padding:0}
 <button id="cancelEditBtn" type="button" class="secondary hidden">Szerkesztés megszakítása</button>
 </form>
 <div id="adminStatus" class="status hidden"></div>
-<div class="admin-tools">
-<h3>👥 Adminisztrátor meghívása</h3>
-<p class="small">Csak bejelentkezett adminisztrátor kezdeményezheti. A funkcióhoz a Supabase-ben a <code>manage-admins</code> Edge Function telepítése szükséges.</p>
-<label for="newAdminEmail">Új adminisztrátor e-mail-címe</label><input id="newAdminEmail" type="email" placeholder="admin@example.com">
-<button id="inviteAdminBtn" type="button">Meghívó küldése</button>
-<div id="adminInviteStatus" class="status hidden"></div>
-</div>
+
 <div class="admin-tools">
 <h3>👥 Felhasználók kezelése</h3>
 <p class="small">A lista a Supabase szerveroldali <code>manage-admins</code> Edge Functionjéből érkezik. Csak jogosult adminisztrátor kérheti le.</p>
@@ -454,19 +449,6 @@ $("createUserBtn").addEventListener("click",async()=>{
     await loadUsers();
   }catch(error){message("usersStatus","A felhasználó létrehozása nem sikerült. A manage-admins Edge Functionnek támogatnia kell az action: create műveletet a username, email és password mezőkkel. Részletek: "+(error.message||"ismeretlen hiba"))}
   finally{$("createUserBtn").disabled=false}
-});
-
-$("inviteAdminBtn").addEventListener("click",async()=>{
-clearMessage("adminInviteStatus");const email=$("newAdminEmail").value.trim();
-if(!isAdmin())return message("adminInviteStatus","Ehhez adminisztrátori belépés szükséges.");
-if(!email||!$("newAdminEmail").checkValidity())return message("adminInviteStatus","Adj meg egy érvényes e-mail-címet.");
-$("inviteAdminBtn").disabled=true;
-try{
-const {data,error}=await db.functions.invoke("manage-admins",{body:{action:"invite",email}});
-if(error)throw error;
-message("adminInviteStatus",data?.message||"A meghívási kérelem elküldve.");$("newAdminEmail").value=""
-}catch(error){message("adminInviteStatus","Az adminmeghívás szerveroldali Supabase-funkció nélkül nem működik. Részletek: "+(error.message||"ismeretlen hiba"))}
-finally{$("inviteAdminBtn").disabled=false}
 });
 
 window.addEventListener("hashchange",setPage);
