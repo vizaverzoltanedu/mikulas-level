@@ -357,6 +357,8 @@ async function prepareMfa(){
     if(enrollError)throw enrollError;
 
     const qrCode=enrollData?.totp?.qr_code;
+    console.log("QR-kód formátuma:", typeof qrCode);
+console.log("QR-kód kezdete:", qrCode?.slice(0,100));
     const secret=enrollData?.totp?.secret;
 
     if(!enrollData?.id||!qrCode||!secret){
