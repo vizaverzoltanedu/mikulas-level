@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="hu">
 <head>
@@ -78,7 +77,6 @@ footer{text-align:center;padding:18px 12px 28px;color:#d7c99e;font:13px Arial,sa
 .envelope-stage.opening .envelope{animation:envelopeLift .8s ease forwards}
 @keyframes envelopeLift{to{transform:translateY(-10px) scale(.97);opacity:.35}}
 .personal-note{white-space:pre-wrap;margin:20px 0;padding:14px;border-left:3px solid #e6c477;background:#ffffff0b;color:#fff1c9;line-height:1.7}
-.admin-tools{border:1px solid #d7bc7655;padding:16px;border-radius:14px;margin:18px 0;background:#ffffff08}
 @media(max-width:600px){header{padding:29px 12px 24px}header:before{left:3%;font-size:30px}header:after{right:3%;font-size:30px}main{margin:16px auto;padding:0 10px 28px}.panel{border-radius:17px;padding:18px}.letter-shell{padding:22px 17px}.qr{width:180px;height:180px}button{max-width:100%}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important}}
 @media print{
@@ -136,18 +134,6 @@ main{max-width:none;margin:0;padding:0}
 <button id="cancelEditBtn" type="button" class="secondary hidden">Szerkesztés megszakítása</button>
 </form>
 <div id="adminStatus" class="status hidden"></div>
-
-<div class="admin-tools">
-<h3>👥 Felhasználók kezelése</h3>
-<p class="small">A lista a Supabase szerveroldali <code>manage-admins</code> Edge Functionjéből érkezik. Csak jogosult adminisztrátor kérheti le.</p>
-<label for="newUserUsername">Új felhasználó neve</label><input id="newUserUsername" type="text" maxlength="80" placeholder="például: oliver" autocomplete="off">
-<label for="newUserEmail">Új felhasználó e-mail-címe</label><input id="newUserEmail" type="email" placeholder="oliver@example.com" autocomplete="off">
-<label for="newUserPassword">Kezdeti jelszó</label><input id="newUserPassword" type="password" minlength="8" placeholder="Legalább 8 karakter" autocomplete="new-password">
-<button id="createUserBtn" type="button">➕ Felhasználó létrehozása</button>
-<button id="refreshUsersBtn" type="button" class="secondary">🔄 Felhasználók frissítése</button>
-<div id="usersStatus" class="status hidden"></div>
-<div id="usersList"></div>
-</div>
 <hr>
 <h2>📚 Elmentett levelek</h2>
 <button id="refreshBtn" class="secondary">Lista frissítése</button>
@@ -234,7 +220,7 @@ show("homePanel",!id&&!isAdmin());
 show("loginPanel",!id&&!isAdmin()&&$("loginPanel").dataset.open==="yes");
 show("adminPanel",!id&&isAdmin());
 if(id){if(displayedPublicId!==id)loadPublicLetter(id)}
-else{displayedPublicId=null;if(isAdmin()){loadLetters();loadUsers()}}
+else{displayedPublicId=null;if(isAdmin()){loadLetters()}}
 }
 function goHome(){history.replaceState(null,"",location.pathname+location.search);setPage()}
 function setBusy(value){busy=value;$("saveBtn").disabled=value;$("saveBtn").textContent=value?"Mentés folyamatban...":"💾 Levél mentése"}
@@ -412,43 +398,6 @@ if(error)throw error;
 message("emailStatus","A küldési kérelmet fogadtuk. "+(data?.message||"Ha a levélküldő szolgáltatás be van állítva, a levél hamarosan megérkezik."))
 }catch(error){message("emailStatus","Az e-mail-küldés még nincs beállítva, vagy a szerver hibát jelzett. A biztonságos küldéshez Supabase Edge Function szükséges. Részletek: "+(error.message||"ismeretlen hiba"))}
 finally{$("sendEmailBtn").disabled=false}
-});
-
-async function loadUsers(){
-  if(!isAdmin())return;
-  message("usersStatus","Felhasználók betöltése...");
-  $("usersList").replaceChildren();
-  try{
-    const {data,error}=await db.functions.invoke("manage-admins",{body:{action:"list"}});
-    if(error)throw error;
-    const users=Array.isArray(data?.users)?data.users:(Array.isArray(data)?data:[]);
-    if(!users.length){$("usersList").textContent="Nincs megjeleníthető felhasználó, vagy a szerver nem adott vissza listát.";clearMessage("usersStatus");return}
-    const table=document.createElement("table");table.style.cssText="width:100%;border-collapse:collapse;margin-top:12px;font:14px Arial,sans-serif";
-    const thead=document.createElement("thead"),tr=document.createElement("tr");
-    ["Felhasználónév","E-mail-cím","Állapot"].forEach(label=>{const th=document.createElement("th");th.textContent=label;th.style.cssText="text-align:left;padding:9px;border-bottom:1px solid #d7bc7655;color:#f1d38c";tr.appendChild(th)});
-    thead.appendChild(tr);table.appendChild(thead);const tbody=document.createElement("tbody");
-    for(const user of users){const row=document.createElement("tr");const vals=[user.username||user.user_metadata?.username||"—",user.email||"—",user.is_online===true?"Online":user.is_online===false?"Offline":(user.last_sign_in_at?"Már belépett":"Még nem lépett be")];
-      vals.forEach(val=>{const td=document.createElement("td");td.textContent=String(val);td.style.cssText="padding:9px;border-bottom:1px solid #d7bc7633;overflow-wrap:anywhere";row.appendChild(td)});tbody.appendChild(row)}
-    table.appendChild(tbody);$("usersList").appendChild(table);clearMessage("usersStatus");
-  }catch(error){message("usersStatus","A felhasználólista lekérése nem sikerült. Ellenőrizd, hogy a manage-admins Edge Function támogatja-e az action: list műveletet. Részletek: "+(error.message||"ismeretlen hiba"))}
-}
-$("refreshUsersBtn").addEventListener("click",loadUsers);
-$("createUserBtn").addEventListener("click",async()=>{
-  clearMessage("usersStatus");
-  const username=$("newUserUsername").value.trim(),email=$("newUserEmail").value.trim(),password=$("newUserPassword").value;
-  if(!isAdmin())return message("usersStatus","Felhasználót csak bejelentkezett adminisztrátor hozhat létre.");
-  if(!username||!email||!password)return message("usersStatus","Töltsd ki a felhasználónevet, az e-mail-címet és a kezdeti jelszót.");
-  if(!$("newUserEmail").checkValidity())return message("usersStatus","Adj meg érvényes e-mail-címet.");
-  if(password.length<8)return message("usersStatus","A jelszó legalább 8 karakter legyen.");
-  $("createUserBtn").disabled=true;
-  try{
-    const {data,error}=await db.functions.invoke("manage-admins",{body:{action:"create",username,email,password}});
-    if(error)throw error;
-    message("usersStatus",data?.message||"A felhasználó létrehozási kérelme sikeres volt.");
-    $("newUserUsername").value="";$("newUserEmail").value="";$("newUserPassword").value="";
-    await loadUsers();
-  }catch(error){message("usersStatus","A felhasználó létrehozása nem sikerült. A manage-admins Edge Functionnek támogatnia kell az action: create műveletet a username, email és password mezőkkel. Részletek: "+(error.message||"ismeretlen hiba"))}
-  finally{$("createUserBtn").disabled=false}
 });
 
 window.addEventListener("hashchange",setPage);
