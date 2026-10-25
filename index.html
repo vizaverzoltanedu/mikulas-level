@@ -7,420 +7,160 @@
 <title>A Mikulás személyes levele 🎅</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{--green:#102b23;--green2:#194337;--red:#8e2033;--red2:#b92e43;--gold:#e6c477;--cream:#fff7e7;--ink:#382a24}
+:root{
+  --green:#102b23;
+  --green2:#194337;
+  --red:#8e2033;
+  --red2:#b92e43;
+  --gold:#e6c477;
+  --cream:#fff7e7;
+  --ink:#382a24;
+}
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
-body{margin:0;min-height:100vh;font-family:Georgia,"Times New Roman",serif;color:var(--cream);background:radial-gradient(ellipse at top,#285344 0%,transparent 48%),linear-gradient(145deg,#091c17,var(--green) 52%,#35151f);overflow-x:hidden}
+body{
+  margin:0;min-height:100vh;font-family:Georgia,"Times New Roman",serif;
+  color:var(--cream);
+  background:
+    radial-gradient(ellipse at top,#285344 0%,transparent 48%),
+    linear-gradient(145deg,#091c17,var(--green) 52%,#35151f);
+  overflow-x:hidden;
+}
 button,input,textarea{font:inherit}
-button{border:1px solid #d7b65f;border-radius:12px;padding:12px 17px;margin:7px 5px 0 0;background:linear-gradient(135deg,var(--red2),var(--red));color:white;font-family:Arial,sans-serif;font-weight:bold;cursor:pointer;box-shadow:0 5px 15px #0003;transition:transform .18s,filter .18s}
+button{
+  border:1px solid #d7b65f;border-radius:12px;padding:12px 17px;
+  margin:7px 5px 0 0;background:linear-gradient(135deg,var(--red2),var(--red));
+  color:white;font-family:Arial,sans-serif;font-weight:bold;cursor:pointer;
+  box-shadow:0 5px 15px #0003;transition:transform .18s,filter .18s;
+}
 button:hover{filter:brightness(1.12);transform:translateY(-1px)}
 button:disabled{opacity:.55;cursor:wait;transform:none}
 button.secondary{background:#29483d;border-color:#6c947c}
 button.danger{background:#6e1927;border-color:#a94b57}
-input,textarea{display:block;width:100%;padding:13px 14px;border-radius:10px;border:1px solid #cbbd9e;background:#fffdf7;color:#30271f}
+input,textarea{
+  display:block;width:100%;padding:13px 14px;border-radius:10px;
+  border:1px solid #cbbd9e;background:#fffdf7;color:#30271f;
+}
 input:focus,textarea:focus{outline:3px solid #e6c47766;border-color:#b28a39}
 textarea{min-height:155px;resize:vertical;line-height:1.6}
 label{display:block;margin:16px 0 7px;font:bold 14px Arial,sans-serif;color:#f2d996}
 a{color:#f1d38c;overflow-wrap:anywhere}
-header{position:relative;text-align:center;padding:35px 16px 29px;background:linear-gradient(135deg,#102d24ef,#641a2aef);border-bottom:2px solid var(--gold);overflow:hidden}
-header:before,header:after{content:"✦";position:absolute;color:#e9cb7c99;font-size:50px;top:15px}
+header{
+  position:relative;text-align:center;padding:35px 16px 29px;
+  background:linear-gradient(135deg,#102d24eF,#641a2aeF);
+  border-bottom:2px solid var(--gold);overflow:hidden;
+}
+header:before,header:after{
+  content:"✦";position:absolute;color:#e9cb7c99;font-size:50px;top:15px;
+}
 header:before{left:8%}header:after{right:8%}
 header h1{margin:0 0 9px;font-size:clamp(27px,5vw,46px);color:#ffe8ad;text-shadow:0 2px 18px #e5b94a44}
 header p{margin:0;color:#e6e8d9;font:14px Arial,sans-serif;letter-spacing:.5px}
 .eyebrow{font:11px Arial,sans-serif;letter-spacing:3px;color:var(--gold);margin-bottom:12px}
 main{max-width:920px;margin:25px auto;padding:0 14px 45px}
-.panel{position:relative;background:linear-gradient(145deg,#17382ef5,#10271ff5);border:1px solid #b8944c88;border-radius:22px;padding:clamp(18px,4vw,32px);margin-bottom:20px;box-shadow:0 18px 45px #0004}
+.panel{
+  position:relative;background:linear-gradient(145deg,#17382eF5,#10271ff5);
+  border:1px solid #b8944c88;border-radius:22px;padding:clamp(18px,4vw,32px);
+  margin-bottom:20px;box-shadow:0 18px 45px #0004;
+}
 h2{color:#f1d38c;margin:0 0 15px;font-size:clamp(22px,4vw,29px)}
 h3{color:#f1d38c}
 .small{font:13px/1.6 Arial,sans-serif;color:#c6d4c8}
-.status{padding:12px;border-radius:10px;background:#ffffff0d;border:1px solid #d6bd7a55;white-space:pre-wrap;overflow-wrap:anywhere;margin:12px 0;font:14px/1.6 Arial,sans-serif;color:#f9e9c3}
+.status{
+  padding:12px;border-radius:10px;background:#ffffff0d;
+  border:1px solid #d6bd7a55;white-space:pre-wrap;overflow-wrap:anywhere;
+  margin:12px 0;font:14px/1.6 Arial,sans-serif;color:#f9e9c3;
+}
 .hidden{display:none!important}
 label.file-label{margin-top:19px}
 hr{border:0;border-top:1px solid #e5ca8250;margin:24px 0}
-.entry{border:1px solid #d7bc7655;border-radius:15px;padding:17px;margin-top:14px;background:#ffffff08;overflow-wrap:anywhere}
+.entry{
+  border:1px solid #d7bc7655;border-radius:15px;padding:17px;
+  margin-top:14px;background:#ffffff08;overflow-wrap:anywhere;
+}
 .entry h3{margin:0 0 6px}
 .entry a{display:inline-block;margin:8px 0}
-.qr{display:block;width:200px;height:200px;object-fit:contain;margin:15px auto;background:white;border-radius:12px;padding:8px}
-.letter-shell{position:relative;overflow:hidden;margin-top:20px;padding:clamp(20px,5vw,42px);border-radius:20px;border:1px solid #d8b85e;background:radial-gradient(ellipse at 50% 0%,#ffffff12,transparent 65%),linear-gradient(145deg,#1c4738,#102d25 75%);box-shadow:inset 0 0 35px #0002,0 12px 35px #0003}
-.letter-shell:before{content:"";position:absolute;inset:8px;border:1px solid #d8b85e55;border-radius:14px;pointer-events:none}
+.qr{
+  display:block;width:200px;height:200px;object-fit:contain;
+  margin:15px auto;background:white;border-radius:12px;padding:8px;
+}
+.letter-shell{
+  position:relative;overflow:hidden;margin-top:20px;padding:clamp(20px,5vw,42px);
+  border-radius:20px;border:1px solid #d8b85e;
+  background:
+    radial-gradient(ellipse at 50% 0%,#ffffff12,transparent 65%),
+    linear-gradient(145deg,#1c4738,#102d25 75%);
+  box-shadow:inset 0 0 35px #0002,0 12px 35px #0003;
+}
+.letter-shell:before{
+  content:"";position:absolute;inset:8px;border:1px solid #d8b85e55;
+  border-radius:14px;pointer-events:none;
+}
 .letter-top{text-align:center;position:relative}
-.santa-medallion{width:76px;height:76px;border-radius:50%;margin:0 auto 16px;display:grid;place-items:center;font-size:40px;background:linear-gradient(145deg,#a52c3c,#671726);border:2px solid var(--gold);box-shadow:0 0 25px #e7c46a26}
+.santa-medallion{
+  width:76px;height:76px;border-radius:50%;margin:0 auto 16px;
+  display:grid;place-items:center;font-size:40px;
+  background:linear-gradient(145deg,#a52c3c,#671726);
+  border:2px solid var(--gold);box-shadow:0 0 25px #e7c46a26;
+}
 .letter-kicker{font:11px Arial,sans-serif;letter-spacing:3px;color:var(--gold)}
-.letter-title{font-size:clamp(27px,6vw,43px);line-height:1.2;margin:12px 0;color:#ffe7a7;text-shadow:0 0 20px #e8c16b22}
+.letter-title{
+  font-size:clamp(27px,6vw,43px);line-height:1.2;
+  margin:12px 0;color:#ffe7a7;text-shadow:0 0 20px #e8c16b22;
+}
 .letter-rule{color:var(--gold);letter-spacing:8px;margin:17px 0 25px}
 .greeting{font-size:clamp(21px,4vw,28px);color:#ffe7a7;margin:0 0 18px}
-.letter{white-space:pre-wrap;overflow-wrap:anywhere;font-size:clamp(17px,3vw,20px);line-height:1.9;color:#fff6e4;position:relative}
+.letter{
+  white-space:pre-wrap;overflow-wrap:anywhere;font-size:clamp(17px,3vw,20px);
+  line-height:1.9;color:#fff6e4;position:relative;
+}
 .signature{text-align:right;margin-top:30px;color:#e6c477;line-height:1.8}
 .signature strong{font-size:25px;display:block}
-.media-card{margin-top:23px;padding:18px;border-radius:16px;background:#071a1488;border:1px solid #d6b45b66}
+.media-card{
+  margin-top:23px;padding:18px;border-radius:16px;
+  background:#071a1488;border:1px solid #d6b45b66;
+}
 .media-card h3{margin:0 0 12px;font-size:19px}
 audio{width:100%;margin-top:8px}
 .media{display:block;width:100%;max-height:500px;margin-top:10px;border-radius:12px;background:#000}
-.certificate-card{margin-top:23px;padding:20px;border-radius:16px;text-align:center;background:linear-gradient(140deg,#49391c,#1b352b);border:1px solid var(--gold)}
+.certificate-card{
+  margin-top:23px;padding:20px;border-radius:16px;text-align:center;
+  background:linear-gradient(140deg,#49391c,#1b352b);
+  border:1px solid var(--gold);
+}
 .certificate-icon{font-size:42px;margin-bottom:8px}
 .certificate-card h3{margin:4px 0 8px}
 .certificate-card p{color:#f5e6c4;line-height:1.6}
-.certificate-preview{display:block;max-width:100%;max-height:450px;object-fit:contain;margin:15px auto;border-radius:8px;background:white}
-.snowflake{position:fixed;top:-25px;z-index:20;pointer-events:none;color:#fff9e8;text-shadow:0 0 8px #fff;animation:fall linear forwards;opacity:.85}
-@keyframes fall{0%{transform:translate3d(0,-20px,0) rotate(0deg);opacity:0}10%{opacity:.85}90%{opacity:.7}100%{transform:translate3d(35px,110vh,0) rotate(280deg);opacity:0}}
+.certificate-preview{
+  display:block;max-width:100%;max-height:450px;object-fit:contain;
+  margin:15px auto;border-radius:8px;background:white;
+}
+.snowflake{
+  position:fixed;top:-25px;z-index:20;pointer-events:none;
+  color:#fff9e8;text-shadow:0 0 8px #fff;
+  animation:fall linear forwards;opacity:.85;
+}
+@keyframes fall{
+  0%{transform:translate3d(0,-20px,0) rotate(0deg);opacity:0}
+  10%{opacity:.85}
+  90%{opacity:.7}
+  100%{transform:translate3d(35px,110vh,0) rotate(280deg);opacity:0}
+}
 .sparkle{color:#e9cb7c;animation:glow 2.5s ease-in-out infinite alternate}
 @keyframes glow{from{text-shadow:0 0 4px #e9cb7c33}to{text-shadow:0 0 17px #e9cb7cbb}}
 footer{text-align:center;padding:18px 12px 28px;color:#d7c99e;font:13px Arial,sans-serif}
-.north-pole-stamp{display:inline-block;border:2px dashed #d8b85e;border-radius:50%;padding:12px 15px;color:#e6c477;font:bold 11px/1.4 Arial,sans-serif;letter-spacing:1px;transform:rotate(-8deg);margin:18px auto 0;text-align:center}
-.letter-meta{text-align:center;color:#e6c477;font:12px Arial,sans-serif;margin-top:12px}
-.envelope-stage{text-align:center;padding:25px 10px 35px}
-.envelope{position:relative;width:min(320px,85vw);height:205px;margin:20px auto 24px;background:linear-gradient(145deg,#b72b40,#741a2a);border:2px solid #e6c477;border-radius:9px;box-shadow:0 15px 30px #0005;perspective:700px}
-.envelope:before{content:"";position:absolute;inset:0;background:linear-gradient(35deg,transparent 49%,#d98a86 50%,transparent 51%),linear-gradient(-35deg,transparent 49%,#d98a86 50%,transparent 51%);z-index:2}
-.envelope-flap{position:absolute;inset:0 0 auto;height:60%;background:#9d2337;clip-path:polygon(0 0,100% 0,50% 100%);transform-origin:top;transition:transform .8s ease;z-index:3;border-top:2px solid #e6c477}
-.envelope-seal{position:absolute;z-index:4;left:50%;top:52%;transform:translate(-50%,-50%);width:55px;height:55px;border-radius:50%;display:grid;place-items:center;background:#e6c477;color:#741a2a;font-size:27px;border:3px double #741a2a}
-.envelope-stage.opening .envelope-flap{transform:rotateX(180deg);z-index:1}
-.envelope-stage.opening .envelope{animation:envelopeLift .8s ease forwards}
-@keyframes envelopeLift{to{transform:translateY(-10px) scale(.97);opacity:.35}}
-.personal-note{white-space:pre-wrap;margin:20px 0;padding:14px;border-left:3px solid #e6c477;background:#ffffff0b;color:#fff1c9;line-height:1.7}
-.admin-tools{border:1px solid #d7bc7655;padding:16px;border-radius:14px;margin:18px 0;background:#ffffff08}
-@media(max-width:600px){header{padding:29px 12px 24px}header:before{left:3%;font-size:30px}header:after{right:3%;font-size:30px}main{margin:16px auto;padding:0 10px 28px}.panel{border-radius:17px;padding:18px}.letter-shell{padding:22px 17px}.qr{width:180px;height:180px}button{max-width:100%}}
-@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important}}
-@media print{
-@page{size:A4;margin:12mm}
-body{background:#fff!important;color:#241d17!important;overflow:visible}
-header,footer,#loginPanel,#adminPanel,#homePanel,#readerStatus,.print-button-wrap,.media-card,.certificate-card,.email-optin,.envelope-stage,.no-print{display:none!important}
-main{max-width:none;margin:0;padding:0}
-#readerPanel{display:block!important;background:#fff!important;border:0!important;box-shadow:none!important;padding:0!important;margin:0!important}
-#readerContent{display:block!important}
-.letter-shell{margin:0!important;padding:12mm!important;border:2px solid #a98b45!important;border-radius:0!important;box-shadow:none!important;background:#fffaf0!important;color:#30271f!important;break-inside:avoid;print-color-adjust:exact;-webkit-print-color-adjust:exact}
-.letter-shell:before{inset:4mm;border-color:#c9ad67!important}
-.letter-title,.greeting,.signature,.letter-kicker,.letter-rule,.north-pole-stamp,.letter-meta{color:#674522!important;text-shadow:none!important}
-.letter{color:#30271f!important;font-size:14pt!important;line-height:1.55!important;overflow-wrap:anywhere}
-.greeting{font-size:19pt!important}
-.santa-medallion{background:#8e2033!important;print-color-adjust:exact;-webkit-print-color-adjust:exact}
-.signature strong{color:#8e2033!important}
+@media(max-width:600px){
+  header{padding:29px 12px 24px}
+  header:before{left:3%;font-size:30px}
+  header:after{right:3%;font-size:30px}
+  main{margin:16px auto;padding:0 10px 28px}
+  .panel{border-radius:17px;padding:18px}
+  .letter-shell{padding:22px 17px}
+  .qr{width:180px;height:180px}
+  button{max-width:100%}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important}
 }
 </style>
 </head>
-<body>
-<header>
-<div class="eyebrow">✦ ÉSZAKI-SARKI POSTA ✦</div>
-<h1>🎅 A Mikulás levelei</h1>
-<p>Személyes üzenetek, egy csipetnyi karácsonyi varázslattal</p>
-</header>
-<main>
-<section id="loginPanel" class="panel hidden">
-<h2>🔐 Adminisztrátori belépés</h2>
-<p class="small">A levelek kezelése csak a jogosult adminisztrátor számára érhető el.</p>
-<form id="loginForm">
-<label for="email">E-mail-cím</label><input id="email" type="email" autocomplete="username" required>
-<label for="password">Jelszó</label><input id="password" type="password" autocomplete="current-password" required>
-<button type="submit">Belépés</button>
-</form>
-<div id="loginStatus" class="status hidden"></div>
-</section>
-
-<section id="adminPanel" class="panel hidden">
-<h2>🎁 Mikulás-levél műhely</h2>
-<p class="small">Készíts személyre szabott leveleket, tölts fel hangot, videót és oklevelet.</p>
-<button id="logoutBtn" class="secondary">Kijelentkezés</button>
-<hr>
-<h2 id="formTitle">Új levél készítése</h2>
-<form id="letterForm">
-<input type="hidden" id="letterId">
-<label for="nev">A címzett neve</label><input id="nev" maxlength="200" required placeholder="Például: Olivér">
-<label for="uzenet">A Mikulás levele</label><textarea id="uzenet" required placeholder="Kedves Olivér!&#10;&#10;..."></textarea>
-<label for="dicseret">⭐ Személyes dicséret (nem kötelező)</label><textarea id="dicseret" maxlength="1000" placeholder="Például: Nagyon büszke vagyok rád..."></textarea>
-<label for="kedvenc">🎨 Kedvenc elfoglaltság (nem kötelező)</label><input id="kedvenc" maxlength="500" placeholder="Például: rajzolás, focizás">
-<label for="joKivansag">✨ Személyes jókívánság (nem kötelező)</label><textarea id="joKivansag" maxlength="1000" placeholder="Például: Sok vidám kalandot kívánok..."></textarea>
-<label class="file-label" for="audioFile">🎵 Hangfelvétel (MP3, M4A, WAV, OGG)</label><input id="audioFile" type="file" accept="audio/*"><p id="currentAudio" class="small"></p>
-<label class="file-label" for="videoFile">🎬 Videó (MP4, WebM, MOV)</label><input id="videoFile" type="file" accept="video/*"><p id="currentVideo" class="small"></p>
-<label class="file-label" for="certificateFile">🏅 Oklevél (PDF, PNG, JPG)</label><input id="certificateFile" type="file" accept=".pdf,.png,.jpg,.jpeg,application/pdf,image/png,image/jpeg"><p id="currentCertificate" class="small"></p>
-<button id="saveBtn" type="submit">💾 Levél mentése</button>
-<button id="cancelEditBtn" type="button" class="secondary hidden">Szerkesztés megszakítása</button>
-</form>
-<div id="adminStatus" class="status hidden"></div>
-<div class="admin-tools">
-<h3>👥 Adminisztrátor meghívása</h3>
-<p class="small">Csak bejelentkezett adminisztrátor kezdeményezheti. A funkcióhoz a Supabase-ben a <code>manage-admins</code> Edge Function telepítése szükséges.</p>
-<label for="newAdminEmail">Új adminisztrátor e-mail-címe</label><input id="newAdminEmail" type="email" placeholder="admin@example.com">
-<button id="inviteAdminBtn" type="button">Meghívó küldése</button>
-<div id="adminInviteStatus" class="status hidden"></div>
-</div>
-<hr>
-<h2>📚 Elmentett levelek</h2>
-<button id="refreshBtn" class="secondary">Lista frissítése</button>
-<div id="letterList"></div>
-</section>
-
-<section id="readerPanel" class="panel hidden">
-<div id="readerStatus" class="status">A levél betöltése...</div>
-<div id="envelopeStage" class="envelope-stage hidden">
-<h2>💌 Egy különleges levél érkezett!</h2>
-<p class="small">A Mikulás személyesen neked küldte. Nyisd ki a borítékot!</p>
-<div class="envelope" aria-hidden="true"><div class="envelope-flap"></div><div class="envelope-seal">🎅</div></div>
-<button id="openEnvelopeBtn" type="button">💌 Levél megnyitása</button>
-</div>
-<div id="readerContent" class="hidden">
-<div class="letter-shell">
-<div class="letter-top">
-<div class="santa-medallion">🎅</div>
-<div class="letter-kicker">SZEMÉLYES ÜZENET AZ ÉSZAKI-SARKRÓL</div>
-<h2 class="letter-title"><span class="sparkle">A Mikulás levele</span></h2>
-<div class="letter-rule">✦ ❄ ✦ ❄ ✦</div>
-</div>
-<p id="readerGreeting" class="greeting"></p>
-<div id="readerLetter" class="letter"></div>
-<div id="readerPersonalization"></div>
-<div class="signature">Szeretettel és ünnepi varázslattal,<strong>A Mikulás 🎅</strong><span style="font-size:12px;color:#c8b77e">Északi-sarki posta</span></div>
-<div id="letterMeta" class="letter-meta"></div>
-<div class="north-pole-stamp">ÉSZAKI-SARKI POSTA<br>ELLENŐRZÖTT LEVÉL ✦</div>
-</div>
-<div class="print-button-wrap"><button id="printLetterBtn" type="button">🖨️ Levél nyomtatása</button></div>
-<div id="readerAudioBox" class="media-card hidden"><h3>🎵 A Mikulás hangüzenete</h3><p class="small">Hallgasd meg a neked szóló üzenetet!</p><audio id="readerAudio" controls preload="metadata"></audio></div>
-<div id="readerVideoBox" class="media-card hidden"><h3>🎬 A Mikulás videóüzenete</h3><p class="small">A videó itt látható; a lejátszáshoz nyomd meg a ▶ gombot.</p><video id="readerVideo" class="media" controls playsinline preload="metadata"></video></div>
-<div id="readerCertificateBox" class="certificate-card hidden">
-<div class="certificate-icon">🏅</div><h3>A te különleges okleveled</h3><p>A Mikulás egy személyes oklevéllel is készült neked!</p>
-<img id="readerCertificateImage" class="certificate-preview hidden" alt="Személyes oklevél">
-<div><a id="readerCertificateOpen" href="#" target="_blank" rel="noopener"><button type="button">📜 Oklevél megnyitása</button></a> <a id="readerCertificateDownload" href="#" download><button type="button" class="secondary">⬇ Oklevél letöltése</button></a></div>
-</div>
-<div id="autoCertificateBox" class="certificate-card hidden">
-<div class="certificate-icon">🏅</div><h3>Automatikus névre szóló oklevél</h3><p id="autoCertificateText"></p>
-<button id="printCertificateBtn" type="button">🖨️ Oklevél nyomtatása / PDF mentése</button>
-</div>
-<div class="email-optin media-card">
-<h3>✉️ Kéred e-mailben is a leveledet?</h3>
-<p class="small">Csak akkor küldjük el, ha te ezt kifejezetten kéred és megadod az e-mail-címedet.</p>
-<label for="recipientEmail">E-mail-cím</label><input id="recipientEmail" type="email" placeholder="pelda@email.hu" autocomplete="email">
-<label style="display:flex;gap:10px;align-items:flex-start"><input id="emailConsent" type="checkbox" style="width:auto;margin-top:2px">Kifejezetten kérem, hogy a Mikulás-levelet elküldjék erre az e-mail-címre.</label>
-<button id="sendEmailBtn" type="button">✉️ Levél küldése e-mailben</button>
-<div id="emailStatus" class="status hidden"></div>
-</div>
-</div>
-</section>
-
-<section id="homePanel" class="panel hidden">
-<h2>🎄 Üdvözöl az Északi-sarki posta!</h2>
-<p style="line-height:1.8">A személyes Mikulás-leveled megnyitásához olvasd be a saját QR-kódodat, vagy nyisd meg az egyedi hivatkozást, amit kaptál.</p>
-<p class="small">Ha adminisztrátor vagy, itt tudsz belépni a levelek kezeléséhez.</p>
-<button id="showLoginBtn">🔐 Adminisztrátori belépés</button>
-</section>
-</main>
-<footer>✦ Készült szeretettel az ünnepekre ✦</footer>
-
-<script>
-"use strict";
-const SUPABASE_URL="https://hzotmdvbzjbsaxyzfucb.supabase.co";
-const SUPABASE_KEY="sb_publishable_qoY-wd9svlgGxB-Dp62q0g_SHYOJ0WB";
-const BUCKET="mikulas-media";
-const TABLE="mikulas_levelek";
-const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-const $=id=>document.getElementById(id);
-let currentSession=null,currentLetter=null,busy=false,displayedPublicId=null;
-
-function show(id,visible){$(id).classList.toggle("hidden",!visible)}
-function message(id,text){$(id).textContent=text;show(id,true)}
-function clearMessage(id){$(id).textContent="";show(id,false)}
-function escapeFileName(name){return name.normalize("NFKD").replace(/[^\w.-]+/g,"_").slice(-100)||"media"}
-function safeText(el,text){el.textContent=text||""}
-function isAdmin(){return !!currentSession?.user}
-function publicLetterUrl(id){return location.origin+location.pathname+"#level="+encodeURIComponent(id)}
-function letterIdFromHash(){const match=location.hash.match(/^#level=([0-9a-f-]{36})$/i);return match?match[1]:null}
-function setPage(){
-const id=letterIdFromHash();
-show("readerPanel",!!id);
-show("homePanel",!id&&!isAdmin());
-show("loginPanel",!id&&!isAdmin()&&$("loginPanel").dataset.open==="yes");
-show("adminPanel",!id&&isAdmin());
-if(id){if(displayedPublicId!==id)loadPublicLetter(id)}
-else{displayedPublicId=null;if(isAdmin())loadLetters()}
-}
-function goHome(){history.replaceState(null,"",location.pathname+location.search);setPage()}
-function setBusy(value){busy=value;$("saveBtn").disabled=value;$("saveBtn").textContent=value?"Mentés folyamatban...":"💾 Levél mentése"}
-
-$("showLoginBtn").addEventListener("click",()=>{$("loginPanel").dataset.open="yes";show("loginPanel",true);$("email").focus()});
-$("loginForm").addEventListener("submit",async event=>{
-event.preventDefault();clearMessage("loginStatus");
-const email=$("email").value.trim(),password=$("password").value;
-const {error}=await db.auth.signInWithPassword({email,password});
-if(error){message("loginStatus","Nem sikerült belépni: "+error.message);return}
-$("password").value="";$("loginPanel").dataset.open="";
-currentSession=(await db.auth.getSession()).data.session;setPage()
-});
-$("logoutBtn").addEventListener("click",async()=>{await db.auth.signOut();currentSession=null;$("loginPanel").dataset.open="";goHome()});
-db.auth.onAuthStateChange((_event,session)=>{currentSession=session;setPage()});
-
-async function uploadMedia(file,kind){
-if(!file)return null;
-const allowedByKind={
-audio:{types:["audio/mpeg","audio/mp3","audio/mp4","audio/x-m4a","audio/wav","audio/x-wav","audio/ogg","audio/aac"],extensions:/\.(mp3|m4a|wav|ogg|aac)$/i,message:"Hangfájlt válassz (MP3, M4A, WAV vagy OGG)."},
-video:{types:["video/mp4","video/webm","video/quicktime"],extensions:/\.(mp4|webm|mov)$/i,message:"Videófájlt válassz (MP4, WebM vagy MOV)."},
-certificate:{types:["application/pdf","image/png","image/jpeg"],extensions:/\.(pdf|png|jpg|jpeg)$/i,message:"Az oklevél PDF, PNG vagy JPG fájl legyen."}
-};
-const rule=allowedByKind[kind];if(!rule)throw new Error("Ismeretlen fájltípus.");
-if(file.type&&!rule.types.includes(file.type)&&!rule.extensions.test(file.name))throw new Error(rule.message);
-if(kind==="certificate"&&file.size>15*1024*1024)throw new Error("Az oklevél legfeljebb 15 MB méretű lehet.");
-const path=kind+"/"+crypto.randomUUID()+"-"+escapeFileName(file.name);
-const {error}=await db.storage.from(BUCKET).upload(path,file,{cacheControl:"3600",upsert:false,contentType:file.type||undefined});
-if(error)throw error;
-return db.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
-}
-
-$("letterForm").addEventListener("submit",async event=>{
-event.preventDefault();if(busy)return;
-if(!isAdmin()){message("adminStatus","A mentéshez adminisztrátorként be kell jelentkezned.");return}
-setBusy(true);clearMessage("adminStatus");
-try{
-const id=$("letterId").value,name=$("nev").value.trim(),letter=$("uzenet").value.trim();
-if(!name||!letter)throw new Error("Add meg a címzett nevét és a levelet is.");
-let audioUrl=currentLetter?.hang_url||null,videoUrl=currentLetter?.video_url||null,certificateUrl=currentLetter?.oklevel_url||null;
-const audioFile=$("audioFile").files[0],videoFile=$("videoFile").files[0],certificateFile=$("certificateFile").files[0];
-if(audioFile)audioUrl=await uploadMedia(audioFile,"audio");
-if(videoFile)videoUrl=await uploadMedia(videoFile,"video");
-if(certificateFile)certificateUrl=await uploadMedia(certificateFile,"certificate");
-const record={nev:name,level:letter,dicseret:$("dicseret").value.trim()||null,kedvenc_elfoglaltsag:$("kedvenc").value.trim()||null,jo_kivansag:$("joKivansag").value.trim()||null,hang_url:audioUrl,video_url:videoUrl,oklevel_url:certificateUrl};
-const result=id?await db.from(TABLE).update(record).eq("id",id).select().single():await db.from(TABLE).insert(record).select().single();
-if(result.error)throw result.error;
-message("adminStatus","Sikeresen elmentve! A levél egyedi QR-kódja a listában található.");
-resetForm();await loadLetters()
-}catch(error){message("adminStatus","Hiba történt: "+(error.message||"Ismeretlen hiba"))}
-finally{setBusy(false)}
-});
-
-function resetForm(){
-$("letterForm").reset();$("letterId").value="";currentLetter=null;$("formTitle").textContent="Új levél készítése";$("currentAudio").textContent="";$("currentVideo").textContent="";$("currentCertificate").textContent="";show("cancelEditBtn",false)
-}
-$("cancelEditBtn").addEventListener("click",resetForm);
-$("refreshBtn").addEventListener("click",loadLetters);
-
-async function loadLetters(){
-if(!isAdmin())return;
-$("letterList").textContent="Levelek betöltése...";
-const {data,error}=await db.from(TABLE).select("*").order("letrehozva",{ascending:false});
-if(error){$("letterList").textContent="Nem sikerült betölteni a leveleket: "+error.message;return}
-$("letterList").replaceChildren();
-if(!data.length){$("letterList").textContent="Még nincs elmentett levél. Készítsd el az elsőt fent!";return}
-for(const item of data){
-const entry=document.createElement("div");entry.className="entry";
-const title=document.createElement("h3");title.textContent="🎁 "+item.nev;entry.appendChild(title);
-const date=document.createElement("p");date.className="small";date.textContent=item.letrehozva?new Date(item.letrehozva).toLocaleString("hu-HU"):"";entry.appendChild(date);
-const link=publicLetterUrl(item.id),open=document.createElement("a");open.href=link;open.textContent="A levél megnyitása";open.target="_blank";open.rel="noopener";entry.appendChild(open);
-const qr=document.createElement("img");qr.className="qr";qr.alt="QR-kód: "+item.nev;qr.loading="lazy";qr.src="https://api.qrserver.com/v1/create-qr-code/?size=350x350&data="+encodeURIComponent(link);entry.appendChild(qr);
-const copy=document.createElement("button");copy.textContent="Hivatkozás másolása";
-copy.addEventListener("click",async()=>{try{await navigator.clipboard.writeText(link);copy.textContent="Másolva!"}catch{window.prompt("Másold ki ezt a hivatkozást:",link)}});
-entry.appendChild(copy);
-if(item.oklevel_url){const certLink=document.createElement("a");certLink.href=item.oklevel_url;certLink.textContent="🏅 Oklevél megnyitása";certLink.target="_blank";certLink.rel="noopener";certLink.style.display="block";entry.appendChild(certLink)}
-const edit=document.createElement("button");edit.className="secondary";edit.textContent="Szerkesztés";edit.addEventListener("click",()=>editLetter(item));entry.appendChild(edit);
-const del=document.createElement("button");del.className="danger";del.textContent="Törlés";del.addEventListener("click",()=>deleteLetter(item));entry.appendChild(del);
-$("letterList").appendChild(entry)
-}
-}
-
-function editLetter(item){
-currentLetter=item;$("letterId").value=item.id;$("nev").value=item.nev||"";$("uzenet").value=item.level||"";
-$("dicseret").value=item.dicseret||"";$("kedvenc").value=item.kedvenc_elfoglaltsag||"";$("joKivansag").value=item.jo_kivansag||"";
-$("audioFile").value="";$("videoFile").value="";$("certificateFile").value="";
-$("currentAudio").textContent=item.hang_url?"Jelenlegi hangfelvétel megmarad, ha nem választasz újat.":"Nincs jelenlegi hangfelvétel.";
-$("currentVideo").textContent=item.video_url?"Jelenlegi videó megmarad, ha nem választasz újat.":"Nincs jelenlegi videó.";
-$("currentCertificate").textContent=item.oklevel_url?"Jelenlegi oklevél megmarad, ha nem választasz újat.":"Nincs jelenlegi oklevél.";
-$("formTitle").textContent="Levél szerkesztése: "+item.nev;show("cancelEditBtn",true);window.scrollTo({top:0,behavior:"smooth"})
-}
-
-async function deleteLetter(item){
-if(!isAdmin())return;
-if(!confirm("Biztosan törlöd ezt a levelet: "+item.nev+"?"))return;
-const {error}=await db.from(TABLE).delete().eq("id",item.id);
-if(error){message("adminStatus","Nem sikerült törölni: "+error.message);return}
-message("adminStatus","A levél törölve lett az adatbázisból. A feltöltött fájlok a tárhelyen megmaradhatnak.");await loadLetters()
-}
-
-function resetReaderMedia(){
-const audio=$("readerAudio"),video=$("readerVideo");audio.pause();video.pause();audio.removeAttribute("src");video.removeAttribute("src");audio.load();video.load();
-$("readerCertificateImage").removeAttribute("src");$("readerCertificateOpen").removeAttribute("href");$("readerCertificateDownload").removeAttribute("href");
-show("readerCertificateImage",false);show("readerCertificateBox",false)
-}
-
-async function loadPublicLetter(id){
-displayedPublicId=id;show("readerContent",false);show("envelopeStage",false);message("readerStatus","A Mikulás levele úton van hozzád...");resetReaderMedia();
-const {data,error}=await db.from(TABLE).select("*").eq("id",id).maybeSingle();
-if(displayedPublicId!==id)return;
-if(error||!data){message("readerStatus","Ez a levél nem található. Ellenőrizd a QR-kódot vagy a hivatkozást.");return}
-safeText($("readerGreeting"),"Kedves "+data.nev+"!");safeText($("readerLetter"),data.level);
-const extras=[
-data.dicseret?"⭐ Személyes dicséret\n"+data.dicseret:"",
-data.kedvenc_elfoglaltsag?"🎨 Amit szeretsz\n"+data.kedvenc_elfoglaltsag:"",
-data.jo_kivansag?"✨ Neked szóló jókívánság\n"+data.jo_kivansag:""
-].filter(Boolean);
-const personal=$("readerPersonalization");personal.replaceChildren();personal.classList.toggle("hidden",extras.length===0);
-for(const extra of extras){const p=document.createElement("div");p.className="personal-note";p.textContent=extra;personal.appendChild(p)}
-const created=data.letrehozva?new Date(data.letrehozva):new Date();
-safeText($("letterMeta"),"Kiállítva: "+created.toLocaleDateString("hu-HU")+" · Északi-sarki levél");
-safeText($("autoCertificateText"),data.nev+" részére, a Mikulás személyes elismerésével.");
-show("autoCertificateBox",true);clearMessage("readerStatus");show("envelopeStage",true);show("readerContent",false);
-const audio=$("readerAudio"),video=$("readerVideo");
-show("readerAudioBox",!!data.hang_url);if(data.hang_url){audio.src=data.hang_url;audio.load()}
-show("readerVideoBox",!!data.video_url);if(data.video_url){video.src=data.video_url;video.load()}
-show("readerCertificateBox",!!data.oklevel_url);
-if(data.oklevel_url){
-const url=data.oklevel_url;$("readerCertificateOpen").href=url;$("readerCertificateDownload").href=url;
-$("readerCertificateDownload").setAttribute("download","mikulas-oklevel-"+(data.nev||"gyermek").replace(/[^\p{L}\p{N}-]+/gu,"-"));
-if(/\.(png|jpe?g)(?:[?#]|$)/i.test(url)){$("readerCertificateImage").src=url;show("readerCertificateImage",true)}
-}
-}
-
-$("printLetterBtn").addEventListener("click",()=>window.print());
-$("openEnvelopeBtn").addEventListener("click",()=>{
-$("envelopeStage").classList.add("opening");$("openEnvelopeBtn").disabled=true;
-const reduced=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-window.setTimeout(()=>{show("envelopeStage",false);show("readerContent",true);$("openEnvelopeBtn").disabled=false;$("envelopeStage").classList.remove("opening")},reduced?0:750)
-});
-
-$("printCertificateBtn").addEventListener("click",()=>{
-const name=$("readerGreeting").textContent.replace(/^Kedves\s*/,"").replace(/!$/,"");
-const date=$("letterMeta").textContent.replace(/^Kiállítva:\s*/,"");
-const cert=`<!DOCTYPE html><html lang="hu"><head><meta charset="UTF-8"><title>Mikulás-oklevél</title><style>@page{size:A4 landscape;margin:12mm}body{font-family:Georgia,serif;text-align:center;color:#573d20;background:#fffaf0;padding:25px;border:12px double #b89545}h1{font-size:38px;color:#8e2033;margin:18px}h2{font-size:28px;margin:25px}p{font-size:19px;line-height:1.7}.seal{border:3px dashed #b89545;border-radius:50%;padding:18px;display:inline-block;margin:20px;color:#8e2033;font:bold 13px Arial}</style></head><body><div style="font-size:50px">🎅 ✦ ❄ ✦ 🎄</div><h1>ÉSZAKI-SARKI ELISMERŐ OKLEVÉL</h1><p>Ez az oklevél szeretettel és ünnepi varázslattal készült</p><h2>${escapeHtml(name)}</h2><p>részére, a Mikulás személyes jókívánságával.<br>Legyen az ünneped örömteli, vidám és varázslatos!</p><div class="seal">ÉSZAKI-SARKI POSTA<br>HIVATALOS OKLEVÉL ✦</div><p>${escapeHtml(date)}</p><h2>A Mikulás 🎅</h2><script>window.onload=()=>window.print()<\/script></body></html>`;
-const w=window.open("","_blank");
-if(!w){alert("A böngésző letiltotta a felugró ablakot. Engedélyezd az oldal számára, majd próbáld újra.");return}
-w.document.open();w.document.write(cert);w.document.close()
-});
-
-function escapeHtml(value){return String(value??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]))}
-
-$("sendEmailBtn").addEventListener("click",async()=>{
-clearMessage("emailStatus");
-const email=$("recipientEmail").value.trim();
-if(!$("emailConsent").checked)return message("emailStatus","A küldéshez előbb jelöld be a kifejezett hozzájárulást.");
-if(!email||!$("recipientEmail").checkValidity())return message("emailStatus","Adj meg egy érvényes e-mail-címet.");
-if(!displayedPublicId)return message("emailStatus","Nem található a levél azonosítója.");
-$("sendEmailBtn").disabled=true;
-try{
-const {data,error}=await db.functions.invoke("send-letter-email",{body:{letter_id:displayedPublicId,email,consent:true}});
-if(error)throw error;
-message("emailStatus","A küldési kérelmet fogadtuk. "+(data?.message||"Ha a levélküldő szolgáltatás be van állítva, a levél hamarosan megérkezik."))
-}catch(error){message("emailStatus","Az e-mail-küldés még nincs beállítva, vagy a szerver hibát jelzett. A biztonságos küldéshez Supabase Edge Function szükséges. Részletek: "+(error.message||"ismeretlen hiba"))}
-finally{$("sendEmailBtn").disabled=false}
-});
-
-$("inviteAdminBtn").addEventListener("click",async()=>{
-clearMessage("adminInviteStatus");const email=$("newAdminEmail").value.trim();
-if(!isAdmin())return message("adminInviteStatus","Ehhez adminisztrátori belépés szükséges.");
-if(!email||!$("newAdminEmail").checkValidity())return message("adminInviteStatus","Adj meg egy érvényes e-mail-címet.");
-$("inviteAdminBtn").disabled=true;
-try{
-const {data,error}=await db.functions.invoke("manage-admins",{body:{action:"invite",email}});
-if(error)throw error;
-message("adminInviteStatus",data?.message||"A meghívási kérelem elküldve.");$("newAdminEmail").value=""
-}catch(error){message("adminInviteStatus","Az adminmeghívás szerveroldali Supabase-funkció nélkül nem működik. Részletek: "+(error.message||"ismeretlen hiba"))}
-finally{$("inviteAdminBtn").disabled=false}
-});
-
-window.addEventListener("hashchange",setPage);
-function startSnow(){
-if(window.matchMedia("(prefers-reduced-motion: reduce)").matches)return;
-const symbols=["❄","❅","✦","❆"];
-function flake(){
-const el=document.createElement("span");el.className="snowflake";el.textContent=symbols[Math.floor(Math.random()*symbols.length)];el.style.left=Math.random()*100+"vw";el.style.fontSize=(10+Math.random()*14)+"px";
-const duration=7+Math.random()*9;el.style.animationDuration=duration+"s";document.body.appendChild(el);setTimeout(()=>el.remove(),duration*1000)
-}
-for(let i=0;i<16;i++)setTimeout(flake,i*250);
-setInterval(flake,650)
-}
-(async function init(){startSnow();const {data}=await db.auth.getSession();currentSession=data.session;setPage()})();
-</script>
-</body>
-</html>
