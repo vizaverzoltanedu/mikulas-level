@@ -8,7 +8,7 @@
 <title>A Mikulás személyes levele 🎅</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{--green:#102b23;--green2:#194337;--red:#8e2033;--gold:#e6c477;--cream:#fff7e7}
+:root{--green:#102b23;--red:#8e2033;--gold:#e6c477;--cream:#fff7e7}
 *{box-sizing:border-box}
 body{margin:0;min-height:100vh;font-family:Georgia,"Times New Roman",serif;color:var(--cream);background:radial-gradient(ellipse at top,#285344,transparent 48%),linear-gradient(145deg,#091c17,var(--green) 52%,#35151f)}
 button,input,textarea{font:inherit}
@@ -59,36 +59,11 @@ audio{width:100%;margin-top:8px}
 .personal-note{white-space:pre-wrap;margin:20px 0;padding:14px;border-left:3px solid #e6c477;background:#ffffff0b;color:#fff1c9;line-height:1.7}
 .admin-tools{border:1px solid #d7bc7655;padding:16px;border-radius:14px;margin:18px 0;background:#ffffff08}
 footer{text-align:center;padding:18px;color:#d7c99e;font:13px Arial,sans-serif}
-
-/* ❄️ Animált hóesés */
-.snowflake{
-position:fixed;
-top:-30px;
-z-index:20;
-pointer-events:none;
-user-select:none;
-color:#fff9e8;
-text-shadow:0 0 8px #ffffff;
-animation:snowFall linear forwards;
-opacity:.9;
-}
-@keyframes snowFall{
-0%{transform:translate3d(0,-20px,0) rotate(0deg);opacity:0}
-10%{opacity:.9}
-90%{opacity:.75}
-100%{transform:translate3d(35px,110vh,0) rotate(280deg);opacity:0}
-}
+.snowflake{position:fixed;top:-30px;z-index:20;pointer-events:none;user-select:none;color:#fff9e8;text-shadow:0 0 8px #ffffff;animation:snowFall linear forwards;opacity:.9}
+@keyframes snowFall{0%{transform:translate3d(0,-20px,0) rotate(0deg);opacity:0}10%{opacity:.9}90%{opacity:.75}100%{transform:translate3d(35px,110vh,0) rotate(280deg);opacity:0}}
 @media(prefers-reduced-motion:reduce){.snowflake{display:none!important}}
 @media(max-width:600px){header{padding:25px 12px}.panel{border-radius:17px;padding:18px}.qr{width:180px;height:180px}}
-@media print{
-@page{size:A4;margin:12mm}
-body{background:white;color:#241d17}
-header,footer,#loginPanel,#adminPanel,#homePanel,#readerStatus,.print-button-wrap,.envelope-stage,.no-print,.snowflake{display:none!important}
-main{max-width:none;margin:0;padding:0}
-#readerPanel{display:block!important;background:white;border:0;box-shadow:none}
-.letter-shell{background:#fffaf0;color:#30271f;box-shadow:none}
-.letter{color:#30271f}
-}
+@media print{@page{size:A4;margin:12mm}body{background:white;color:#241d17}header,footer,#loginPanel,#adminPanel,#homePanel,#readerStatus,.print-button-wrap,.envelope-stage,.no-print,.snowflake{display:none!important}main{max-width:none;margin:0;padding:0}#readerPanel{display:block!important;background:white;border:0;box-shadow:none}.letter-shell{background:#fffaf0;color:#30271f;box-shadow:none}.letter{color:#30271f}}
 </style>
 </head>
 <body>
@@ -97,17 +72,17 @@ main{max-width:none;margin:0;padding:0}
 <h1>🎅 A Mikulás levelei</h1>
 <p>Személyes üzenetek, egy csipetnyi karácsonyi varázslattal</p>
 </header>
-
 <main>
+
 <section id="loginPanel" class="panel hidden">
-<h2>🔐 Adminisztrátori belépés</h2>
-<p class="small">A levelek kezelése csak a jogosult adminisztrátor számára érhető el.</p>
+<h2>🔐 Belépés</h2>
+<p class="small">Felhasználónévvel vagy e-mail-címmel léphetsz be. A levélkezelő csak az adminisztrátor számára érhető el.</p>
 <form id="loginForm">
-<label for="email">E-mail-cím</label>
-<input id="email" type="email" autocomplete="username" required>
+<label for="email">Felhasználónév vagy e-mail-cím</label>
+<input id="email" type="text" autocomplete="username" required placeholder="Felhasználónév vagy e-mail-cím">
 <label for="password">Jelszó</label>
 <input id="password" type="password" autocomplete="current-password" required>
-<button type="submit">Belépés</button>
+<button id="loginBtn" type="submit">Belépés</button>
 </form>
 <div id="loginStatus" class="status hidden"></div>
 </section>
@@ -146,8 +121,11 @@ main{max-width:none;margin:0;padding:0}
 
 <div class="admin-tools">
 <h3>👥 Új felhasználó létrehozása</h3>
-<p class="small">E-mail-címmel és jelszóval hozhatsz létre fiókot. A rendszer nem küld meghívó e-mailt.</p>
+<p class="small">Felhasználónévvel, e-mail-címmel és jelszóval hozhatsz létre fiókot. A rendszer nem küld meghívó e-mailt.</p>
 <form id="createUserForm">
+<label for="newUsername">Új felhasználónév</label>
+<input id="newUsername" type="text" required minlength="3" maxlength="30" pattern="[a-zA-Z0-9_.-]+" autocomplete="off" placeholder="pelda123">
+<p class="small">3–30 karakter; angol betű, szám, pont, kötőjel és aláhúzás használható.</p>
 <label for="newUserEmail">Új felhasználó e-mail-címe</label>
 <input id="newUserEmail" type="email" required autocomplete="off" placeholder="pelda@email.hu">
 <label for="newUserPassword">Jelszó (legalább 8 karakter)</label>
@@ -186,14 +164,8 @@ main{max-width:none;margin:0;padding:0}
 <div id="letterMeta" class="small"></div>
 </div>
 <div class="print-button-wrap"><button id="printLetterBtn" type="button">🖨️ Levél nyomtatása</button></div>
-<div id="readerAudioBox" class="media-card hidden">
-<h3>🎵 A Mikulás hangüzenete</h3>
-<audio id="readerAudio" controls preload="metadata"></audio>
-</div>
-<div id="readerVideoBox" class="media-card hidden">
-<h3>🎬 A Mikulás videóüzenete</h3>
-<video id="readerVideo" class="media" controls playsinline preload="metadata"></video>
-</div>
+<div id="readerAudioBox" class="media-card hidden"><h3>🎵 A Mikulás hangüzenete</h3><audio id="readerAudio" controls preload="metadata"></audio></div>
+<div id="readerVideoBox" class="media-card hidden"><h3>🎬 A Mikulás videóüzenete</h3><video id="readerVideo" class="media" controls playsinline preload="metadata"></video></div>
 <div id="readerCertificateBox" class="certificate-card hidden">
 <h3>🏅 A te különleges okleveled</h3>
 <img id="readerCertificateImage" class="certificate-preview hidden" alt="Személyes oklevél">
@@ -207,7 +179,9 @@ main{max-width:none;margin:0;padding:0}
 <h2>🎄 Üdvözöl az Északi-sarki posta!</h2>
 <p style="line-height:1.8">A személyes Mikulás-leveled megnyitásához olvasd be a saját QR-kódodat, vagy nyisd meg az egyedi hivatkozást, amit kaptál.</p>
 <p class="small">Ha adminisztrátor vagy, itt tudsz belépni a levelek kezeléséhez.</p>
-<button id="showLoginBtn">🔐 Adminisztrátori belépés</button>
+<button id="showLoginBtn">🔐 Belépés</button>
+<button id="userLogoutBtn" class="secondary hidden">Kijelentkezés</button>
+<div id="userStatus" class="status hidden"></div>
 </section>
 </main>
 <footer>✦ Készült szeretettel az ünnepekre ✦</footer>
@@ -238,11 +212,9 @@ function isAdmin(){return currentIsAdmin&&!!currentSession?.user}
 function publicLetterUrl(id){return location.origin+location.pathname+"#level="+encodeURIComponent(id)}
 function letterIdFromHash(){const m=location.hash.match(/^#level=([0-9a-f-]{36})$/i);return m?m[1]:null}
 
-/* ❄️ Hóesés indítása */
 function startSnow(){
   if(window.matchMedia("(prefers-reduced-motion: reduce)").matches)return;
   const symbols=["❄","❅","❆","✦"];
-
   function createSnowflake(){
     const flake=document.createElement("span");
     flake.className="snowflake";
@@ -254,344 +226,367 @@ function startSnow(){
     document.body.appendChild(flake);
     setTimeout(()=>flake.remove(),duration*1000);
   }
-
   for(let i=0;i<16;i++)setTimeout(createSnowflake,i*250);
   setInterval(createSnowflake,650);
 }
 
 function setPage(){
-const id=letterIdFromHash();
-show("readerPanel",!!id);
-show("homePanel",!id&&!isAdmin()&&$("loginPanel").dataset.open!=="yes");
-show("loginPanel",!id&&!isAdmin()&&$("loginPanel").dataset.open==="yes");
-show("adminPanel",!id&&isAdmin());
-if(id){if(displayedPublicId!==id)loadPublicLetter(id)}
-else{displayedPublicId=null;if(isAdmin())loadLetters()}
+  const id=letterIdFromHash();
+  show("readerPanel",!!id);
+  show("homePanel",!id&&!isAdmin()&&$("loginPanel").dataset.open!=="yes");
+  show("loginPanel",!id&&!isAdmin()&&$("loginPanel").dataset.open==="yes");
+  show("adminPanel",!id&&isAdmin());
+  show("userLogoutBtn",!id&&!!currentSession?.user&&!isAdmin());
+  if(id){
+    if(displayedPublicId!==id)loadPublicLetter(id);
+  }else{
+    displayedPublicId=null;
+    if(isAdmin())loadLetters();
+  }
 }
 
 function goHome(){
-history.replaceState(null,"",location.pathname+location.search);
-setPage();
+  history.replaceState(null,"",location.pathname+location.search);
+  setPage();
 }
 
 function setBusy(value){
-busy=value;
-$("saveBtn").disabled=value;
-$("saveBtn").textContent=value?"Mentés folyamatban...":"💾 Levél mentése";
+  busy=value;
+  $("saveBtn").disabled=value;
+  $("saveBtn").textContent=value?"Mentés folyamatban...":"💾 Levél mentése";
 }
 
 async function refreshAdminStatus(){
-const version=++adminCheckVersion;
-currentIsAdmin=false;
-if(!currentSession?.user){setPage();return}
-try{
-const {data,error}=await db.functions.invoke("manage-admins",{body:{action:"check"}});
-if(version!==adminCheckVersion)return;
-currentIsAdmin=!error&&data?.isAdmin===true;
-}catch{
-if(version!==adminCheckVersion)return;
-currentIsAdmin=false;
-}
-setPage();
+  const version=++adminCheckVersion;
+  currentIsAdmin=false;
+  if(!currentSession?.user){setPage();return}
+  try{
+    const {data,error}=await db.functions.invoke("manage-admins",{body:{action:"check"}});
+    if(version!==adminCheckVersion)return;
+    currentIsAdmin=!error&&data?.isAdmin===true;
+  }catch{
+    if(version!==adminCheckVersion)return;
+    currentIsAdmin=false;
+  }
+  setPage();
 }
 
 $("showLoginBtn").addEventListener("click",()=>{
-$("loginPanel").dataset.open="yes";
-show("loginPanel",true);
-show("homePanel",false);
-$("email").focus();
+  $("loginPanel").dataset.open="yes";
+  show("loginPanel",true);
+  show("homePanel",false);
+  $("email").focus();
 });
 
 $("loginForm").addEventListener("submit",async event=>{
-event.preventDefault();
-clearMessage("loginStatus");
-const email=$("email").value.trim();
-const password=$("password").value;
-const {error}=await db.auth.signInWithPassword({email,password});
-if(error){message("loginStatus","Nem sikerült belépni: "+error.message);return}
-$("password").value="";
-$("loginPanel").dataset.open="";
-const {data}=await db.auth.getSession();
-currentSession=data.session;
-await refreshAdminStatus();
-if(!currentIsAdmin){
-await db.auth.signOut();
-currentSession=null;
-currentIsAdmin=false;
-$("loginPanel").dataset.open="yes";
-message("loginStatus","Ehhez az oldalhoz nincs adminisztrátori jogosultságod.");
-setPage();
-}
+  event.preventDefault();
+  clearMessage("loginStatus");
+  const identifier=$("email").value.trim();
+  const password=$("password").value;
+  const button=$("loginBtn");
+  button.disabled=true;
+  try{
+    const {data,error}=await db.functions.invoke("username-login",{
+      body:{identifier,password}
+    });
+    if(error||!data?.access_token||!data?.refresh_token){
+      throw new Error(data?.error||"Hibás felhasználónév vagy jelszó.");
+    }
+    const {error:sessionError}=await db.auth.setSession({
+      access_token:data.access_token,
+      refresh_token:data.refresh_token
+    });
+    if(sessionError)throw sessionError;
+    $("password").value="";
+    $("loginPanel").dataset.open="";
+    const {data:sessionData}=await db.auth.getSession();
+    currentSession=sessionData.session;
+    await refreshAdminStatus();
+    if(isAdmin()){
+      clearMessage("loginStatus");
+      message("adminStatus","Sikeres adminisztrátori belépés.");
+    }else{
+      clearMessage("loginStatus");
+      message("userStatus","Sikeresen beléptél. Az adminisztrátori levelekhez nincs hozzáférésed.");
+      setPage();
+    }
+  }catch(error){
+    message("loginStatus",error.message||"Nem sikerült belépni. Ellenőrizd a felhasználónevet és a jelszót.");
+  }finally{
+    button.disabled=false;
+  }
 });
 
-$("logoutBtn").addEventListener("click",async()=>{
-await db.auth.signOut();
-currentSession=null;
-currentIsAdmin=false;
-$("loginPanel").dataset.open="";
-goHome();
-});
+async function logout(){
+  const {error}=await db.auth.signOut();
+  if(error){message("userStatus","Nem sikerült kijelentkezni: "+error.message);return}
+  currentSession=null;
+  currentIsAdmin=false;
+  $("loginPanel").dataset.open="";
+  clearMessage("userStatus");
+  clearMessage("loginStatus");
+  goHome();
+}
+$("logoutBtn").addEventListener("click",logout);
+$("userLogoutBtn").addEventListener("click",logout);
 
 db.auth.onAuthStateChange((_event,session)=>{
-currentSession=session;
-currentIsAdmin=false;
-if(!session){adminCheckVersion++;setPage();return}
-setTimeout(()=>refreshAdminStatus(),0);
+  currentSession=session;
+  currentIsAdmin=false;
+  if(!session){adminCheckVersion++;setPage();return}
+  setTimeout(()=>refreshAdminStatus(),0);
 });
 
-/* 👥 Adminisztrátori fióklétrehozás */
+/* Új felhasználó létrehozása */
 $("createUserForm").addEventListener("submit",async event=>{
-event.preventDefault();
-clearMessage("createUserStatus");
+  event.preventDefault();
+  clearMessage("createUserStatus");
+  if(!isAdmin()){
+    message("createUserStatus","Ehhez adminisztrátori jogosultság szükséges.");
+    return;
+  }
+  const username=$("newUsername").value.trim().toLowerCase();
+  const email=$("newUserEmail").value.trim();
+  const password=$("newUserPassword").value;
+  const button=$("createUserBtn");
 
-if(!isAdmin()){
-message("createUserStatus","Ehhez adminisztrátori jogosultság szükséges.");
-return;
-}
+  if(!/^[a-z0-9_.-]{3,30}$/.test(username)){
+    message("createUserStatus","A felhasználónév 3–30 karakterből állhat. Csak angol kisbetű, szám, pont, kötőjel és aláhúzás használható.");
+    return;
+  }
+  if(!$("newUserEmail").checkValidity()){
+    message("createUserStatus","Adj meg érvényes e-mail-címet.");
+    return;
+  }
+  if(password.length<8){
+    message("createUserStatus","A jelszó legalább 8 karakter legyen.");
+    return;
+  }
 
-const email=$("newUserEmail").value.trim();
-const password=$("newUserPassword").value;
-
-if(!$("newUserEmail").checkValidity()){
-message("createUserStatus","Adj meg érvényes e-mail-címet.");
-return;
-}
-
-if(password.length<8){
-message("createUserStatus","A jelszó legalább 8 karakter legyen.");
-return;
-}
-
-const button=$("createUserBtn");
-button.disabled=true;
-
-try{
-const {data,error}=await db.functions.invoke("manage-admins",{
-body:{action:"create",email,password}
-});
-
-if(error)throw new Error(error.message||"A kérés sikertelen.");
-if(data?.error)throw new Error(data.error);
-if(!data?.success)throw new Error("A fiók létrehozása nem igazolható.");
-
-message("createUserStatus","Sikeresen létrejött a fiók: "+(data.user?.email||email));
-$("createUserForm").reset();
-
-}catch(error){
-message("createUserStatus","Nem sikerült létrehozni a fiókot: "+(error.message||"Ismeretlen hiba."));
-}finally{
-button.disabled=false;
-}
+  button.disabled=true;
+  try{
+    const {data,error}=await db.functions.invoke("manage-admins",{
+      body:{action:"create",username,email,password}
+    });
+    if(error)throw new Error(data?.error||error.message||"A kérés sikertelen.");
+    if(data?.error)throw new Error(data.error);
+    if(!data?.success)throw new Error("A fiók létrehozása nem igazolható.");
+    message("createUserStatus","Sikeresen létrejött a fiók!\nFelhasználónév: "+username+"\nE-mail-cím: "+(data.user?.email||email));
+    $("createUserForm").reset();
+  }catch(error){
+    message("createUserStatus","Nem sikerült létrehozni a fiókot: "+(error.message||"Ismeretlen hiba."));
+  }finally{
+    button.disabled=false;
+  }
 });
 
 async function uploadMedia(file,kind){
-if(!file)return null;
-const allowed={
-audio:{extensions:/\.(mp3|m4a|wav|ogg|aac)$/i,message:"Hangfájlt válassz (MP3, M4A, WAV vagy OGG)."},
-video:{extensions:/\.(mp4|webm|mov)$/i,message:"Videófájlt válassz (MP4, WebM vagy MOV)."},
-certificate:{extensions:/\.(pdf|png|jpg|jpeg)$/i,message:"Az oklevél PDF, PNG vagy JPG fájl legyen."}
-};
-const rule=allowed[kind];
-if(!rule||!rule.extensions.test(file.name))throw new Error(rule?.message||"Nem megfelelő fájltípus.");
-if(kind==="certificate"&&file.size>15*1024*1024)throw new Error("Az oklevél legfeljebb 15 MB méretű lehet.");
-const path=kind+"/"+crypto.randomUUID()+"-"+escapeFileName(file.name);
-const {error}=await db.storage.from(BUCKET).upload(path,file,{cacheControl:"3600",upsert:false,contentType:file.type||undefined});
-if(error)throw error;
-return db.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
+  if(!file)return null;
+  const allowed={
+    audio:{extensions:/\.(mp3|m4a|wav|ogg|aac)$/i,message:"Hangfájlt válassz (MP3, M4A, WAV vagy OGG)."},
+    video:{extensions:/\.(mp4|webm|mov)$/i,message:"Videófájlt válassz (MP4, WebM vagy MOV)."},
+    certificate:{extensions:/\.(pdf|png|jpg|jpeg)$/i,message:"Az oklevél PDF, PNG vagy JPG fájl legyen."}
+  };
+  const rule=allowed[kind];
+  if(!rule||!rule.extensions.test(file.name))throw new Error(rule?.message||"Nem megfelelő fájltípus.");
+  if(kind==="certificate"&&file.size>15*1024*1024)throw new Error("Az oklevél legfeljebb 15 MB méretű lehet.");
+  const path=kind+"/"+crypto.randomUUID()+"-"+escapeFileName(file.name);
+  const {error}=await db.storage.from(BUCKET).upload(path,file,{cacheControl:"3600",upsert:false,contentType:file.type||undefined});
+  if(error)throw error;
+  return db.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
 }
 
 $("letterForm").addEventListener("submit",async event=>{
-event.preventDefault();
-if(busy)return;
-if(!isAdmin()){message("adminStatus","A mentéshez adminisztrátorként be kell jelentkezned.");return}
-setBusy(true);
-clearMessage("adminStatus");
-try{
-const id=$("letterId").value;
-const name=$("nev").value.trim();
-const letter=$("uzenet").value.trim();
-if(!name||!letter)throw new Error("Add meg a címzett nevét és a levelet is.");
-let audioUrl=currentLetter?.hang_url||null;
-let videoUrl=currentLetter?.video_url||null;
-let certificateUrl=currentLetter?.oklevel_url||null;
-if($("audioFile").files[0])audioUrl=await uploadMedia($("audioFile").files[0],"audio");
-if($("videoFile").files[0])videoUrl=await uploadMedia($("videoFile").files[0],"video");
-if($("certificateFile").files[0])certificateUrl=await uploadMedia($("certificateFile").files[0],"certificate");
-const record={
-nev:name,level:letter,
-dicseret:$("dicseret").value.trim()||null,
-kedvenc_elfoglaltsag:$("kedvenc").value.trim()||null,
-jo_kivansag:$("joKivansag").value.trim()||null,
-hang_url:audioUrl,video_url:videoUrl,oklevel_url:certificateUrl
-};
-const result=id
-?await db.from(TABLE).update(record).eq("id",id).select().single()
-:await db.from(TABLE).insert(record).select().single();
-if(result.error)throw result.error;
-message("adminStatus","Sikeresen elmentve! A levél QR-kódja a listában található.");
-resetForm();
-await loadLetters();
-}catch(error){
-message("adminStatus","Hiba történt: "+(error.message||"Ismeretlen hiba"));
-}finally{setBusy(false)}
+  event.preventDefault();
+  if(busy)return;
+  if(!isAdmin()){message("adminStatus","A mentéshez adminisztrátorként be kell jelentkezned.");return}
+  setBusy(true);
+  clearMessage("adminStatus");
+  try{
+    const id=$("letterId").value;
+    const name=$("nev").value.trim();
+    const letter=$("uzenet").value.trim();
+    if(!name||!letter)throw new Error("Add meg a címzett nevét és a levelet is.");
+    let audioUrl=currentLetter?.hang_url||null;
+    let videoUrl=currentLetter?.video_url||null;
+    let certificateUrl=currentLetter?.oklevel_url||null;
+    if($("audioFile").files[0])audioUrl=await uploadMedia($("audioFile").files[0],"audio");
+    if($("videoFile").files[0])videoUrl=await uploadMedia($("videoFile").files[0],"video");
+    if($("certificateFile").files[0])certificateUrl=await uploadMedia($("certificateFile").files[0],"certificate");
+    const record={
+      nev:name,level:letter,
+      dicseret:$("dicseret").value.trim()||null,
+      kedvenc_elfoglaltsag:$("kedvenc").value.trim()||null,
+      jo_kivansag:$("joKivansag").value.trim()||null,
+      hang_url:audioUrl,video_url:videoUrl,oklevel_url:certificateUrl
+    };
+    const result=id
+      ?await db.from(TABLE).update(record).eq("id",id).select().single()
+      :await db.from(TABLE).insert(record).select().single();
+    if(result.error)throw result.error;
+    message("adminStatus","Sikeresen elmentve! A levél QR-kódja a listában található.");
+    resetForm();
+    await loadLetters();
+  }catch(error){
+    message("adminStatus","Hiba történt: "+(error.message||"Ismeretlen hiba"));
+  }finally{setBusy(false)}
 });
 
 function resetForm(){
-$("letterForm").reset();
-$("letterId").value="";
-currentLetter=null;
-$("formTitle").textContent="Új levél készítése";
-$("currentAudio").textContent="";
-$("currentVideo").textContent="";
-$("currentCertificate").textContent="";
-show("cancelEditBtn",false);
+  $("letterForm").reset();
+  $("letterId").value="";
+  currentLetter=null;
+  $("formTitle").textContent="Új levél készítése";
+  $("currentAudio").textContent="";
+  $("currentVideo").textContent="";
+  $("currentCertificate").textContent="";
+  show("cancelEditBtn",false);
 }
 $("cancelEditBtn").addEventListener("click",resetForm);
 $("refreshBtn").addEventListener("click",loadLetters);
 
 async function loadLetters(){
-if(!isAdmin())return;
-$("letterList").textContent="Levelek betöltése...";
-const {data,error}=await db.from(TABLE).select("*").order("letrehozva",{ascending:false});
-if(error){$("letterList").textContent="Nem sikerült betölteni a leveleket: "+error.message;return}
-$("letterList").replaceChildren();
-if(!data.length){$("letterList").textContent="Még nincs elmentett levél. Készítsd el az elsőt fent!";return}
-for(const item of data){
-const entry=document.createElement("div");
-entry.className="entry";
-const title=document.createElement("h3");
-title.textContent="🎁 "+item.nev;
-entry.appendChild(title);
-const date=document.createElement("p");
-date.className="small";
-date.textContent=item.letrehozva?new Date(item.letrehozva).toLocaleString("hu-HU"):"";
-entry.appendChild(date);
-const link=publicLetterUrl(item.id);
-const open=document.createElement("a");
-open.href=link;open.textContent="A levél megnyitása";open.target="_blank";open.rel="noopener";
-entry.appendChild(open);
-const qr=document.createElement("img");
-qr.className="qr";qr.alt="QR-kód: "+item.nev;qr.loading="lazy";
-qr.src="https://api.qrserver.com/v1/create-qr-code/?size=350x350&data="+encodeURIComponent(link);
-entry.appendChild(qr);
-const copy=document.createElement("button");
-copy.textContent="Hivatkozás másolása";
-copy.addEventListener("click",async()=>{
-try{await navigator.clipboard.writeText(link);copy.textContent="Másolva!"}
-catch{window.prompt("Másold ki ezt a hivatkozást:",link)}
-});
-entry.appendChild(copy);
-if(item.oklevel_url){
-const cert=document.createElement("a");
-cert.href=item.oklevel_url;cert.textContent="🏅 Oklevél megnyitása";cert.target="_blank";cert.rel="noopener";
-cert.style.display="block";entry.appendChild(cert);
-}
-const edit=document.createElement("button");
-edit.className="secondary";edit.textContent="Szerkesztés";
-edit.addEventListener("click",()=>editLetter(item));entry.appendChild(edit);
-const del=document.createElement("button");
-del.className="danger";del.textContent="Törlés";
-del.addEventListener("click",()=>deleteLetter(item));entry.appendChild(del);
-$("letterList").appendChild(entry);
-}
+  if(!isAdmin())return;
+  $("letterList").textContent="Levelek betöltése...";
+  const {data,error}=await db.from(TABLE).select("*").order("letrehozva",{ascending:false});
+  if(error){$("letterList").textContent="Nem sikerült betölteni a leveleket: "+error.message;return}
+  $("letterList").replaceChildren();
+  if(!data.length){$("letterList").textContent="Még nincs elmentett levél. Készítsd el az elsőt fent!";return}
+  for(const item of data){
+    const entry=document.createElement("div");
+    entry.className="entry";
+    const title=document.createElement("h3");
+    title.textContent="🎁 "+item.nev;
+    entry.appendChild(title);
+    const date=document.createElement("p");
+    date.className="small";
+    date.textContent=item.letrehozva?new Date(item.letrehozva).toLocaleString("hu-HU"):"";
+    entry.appendChild(date);
+    const link=publicLetterUrl(item.id);
+    const open=document.createElement("a");
+    open.href=link;open.textContent="A levél megnyitása";open.target="_blank";open.rel="noopener";
+    entry.appendChild(open);
+    const qr=document.createElement("img");
+    qr.className="qr";qr.alt="QR-kód: "+item.nev;qr.loading="lazy";
+    qr.src="https://api.qrserver.com/v1/create-qr-code/?size=350x350&data="+encodeURIComponent(link);
+    entry.appendChild(qr);
+    const copy=document.createElement("button");
+    copy.textContent="Hivatkozás másolása";
+    copy.addEventListener("click",async()=>{
+      try{await navigator.clipboard.writeText(link);copy.textContent="Másolva!"}
+      catch{window.prompt("Másold ki ezt a hivatkozást:",link)}
+    });
+    entry.appendChild(copy);
+    if(item.oklevel_url){
+      const cert=document.createElement("a");
+      cert.href=item.oklevel_url;cert.textContent="🏅 Oklevél megnyitása";cert.target="_blank";cert.rel="noopener";
+      cert.style.display="block";entry.appendChild(cert);
+    }
+    const edit=document.createElement("button");
+    edit.className="secondary";edit.textContent="Szerkesztés";
+    edit.addEventListener("click",()=>editLetter(item));entry.appendChild(edit);
+    const del=document.createElement("button");
+    del.className="danger";del.textContent="Törlés";
+    del.addEventListener("click",()=>deleteLetter(item));entry.appendChild(del);
+    $("letterList").appendChild(entry);
+  }
 }
 
 function editLetter(item){
-currentLetter=item;
-$("letterId").value=item.id;
-$("nev").value=item.nev||"";
-$("uzenet").value=item.level||"";
-$("dicseret").value=item.dicseret||"";
-$("kedvenc").value=item.kedvenc_elfoglaltsag||"";
-$("joKivansag").value=item.jo_kivansag||"";
-$("audioFile").value="";$("videoFile").value="";$("certificateFile").value="";
-$("currentAudio").textContent=item.hang_url?"A jelenlegi hangfelvétel megmarad, ha nem választasz újat.":"Nincs jelenlegi hangfelvétel.";
-$("currentVideo").textContent=item.video_url?"A jelenlegi videó megmarad, ha nem választasz újat.":"Nincs jelenlegi videó.";
-$("currentCertificate").textContent=item.oklevel_url?"A jelenlegi oklevél megmarad, ha nem választasz újat.":"Nincs jelenlegi oklevél.";
-$("formTitle").textContent="Levél szerkesztése: "+item.nev;
-show("cancelEditBtn",true);
-window.scrollTo({top:0,behavior:"smooth"});
+  currentLetter=item;
+  $("letterId").value=item.id;
+  $("nev").value=item.nev||"";
+  $("uzenet").value=item.level||"";
+  $("dicseret").value=item.dicseret||"";
+  $("kedvenc").value=item.kedvenc_elfoglaltsag||"";
+  $("joKivansag").value=item.jo_kivansag||"";
+  $("audioFile").value="";$("videoFile").value="";$("certificateFile").value="";
+  $("currentAudio").textContent=item.hang_url?"A jelenlegi hangfelvétel megmarad, ha nem választasz újat.":"Nincs jelenlegi hangfelvétel.";
+  $("currentVideo").textContent=item.video_url?"A jelenlegi videó megmarad, ha nem választasz újat.":"Nincs jelenlegi videó.";
+  $("currentCertificate").textContent=item.oklevel_url?"A jelenlegi oklevél megmarad, ha nem választasz újat.":"Nincs jelenlegi oklevél.";
+  $("formTitle").textContent="Levél szerkesztése: "+item.nev;
+  show("cancelEditBtn",true);
+  window.scrollTo({top:0,behavior:"smooth"});
 }
 
 async function deleteLetter(item){
-if(!isAdmin())return;
-if(!confirm("Biztosan törlöd ezt a levelet: "+item.nev+"?"))return;
-const {error}=await db.from(TABLE).delete().eq("id",item.id);
-if(error){message("adminStatus","Nem sikerült törölni: "+error.message);return}
-message("adminStatus","A levél törölve lett az adatbázisból. A feltöltött fájlok megmaradhatnak a tárhelyen.");
-await loadLetters();
+  if(!isAdmin())return;
+  if(!confirm("Biztosan törlöd ezt a levelet: "+item.nev+"?"))return;
+  const {error}=await db.from(TABLE).delete().eq("id",item.id);
+  if(error){message("adminStatus","Nem sikerült törölni: "+error.message);return}
+  message("adminStatus","A levél törölve lett az adatbázisból. A feltöltött fájlok megmaradhatnak a tárhelyen.");
+  await loadLetters();
 }
 
 function resetReaderMedia(){
-const audio=$("readerAudio"),video=$("readerVideo");
-audio.pause();video.pause();
-audio.removeAttribute("src");video.removeAttribute("src");
-audio.load();video.load();
-$("readerCertificateImage").removeAttribute("src");
-$("readerCertificateOpen").removeAttribute("href");
-$("readerCertificateDownload").removeAttribute("href");
-show("readerCertificateImage",false);
-show("readerCertificateBox",false);
+  const audio=$("readerAudio"),video=$("readerVideo");
+  audio.pause();video.pause();
+  audio.removeAttribute("src");video.removeAttribute("src");
+  audio.load();video.load();
+  $("readerCertificateImage").removeAttribute("src");
+  $("readerCertificateOpen").removeAttribute("href");
+  $("readerCertificateDownload").removeAttribute("href");
+  show("readerCertificateImage",false);
+  show("readerCertificateBox",false);
 }
 
 async function loadPublicLetter(id){
-displayedPublicId=id;
-show("readerContent",false);
-show("envelopeStage",false);
-message("readerStatus","A Mikulás levele úton van hozzád...");
-resetReaderMedia();
-const {data,error}=await db.from(TABLE).select("*").eq("id",id).maybeSingle();
-if(displayedPublicId!==id)return;
-if(error||!data){message("readerStatus","Ez a levél nem található. Ellenőrizd a QR-kódot vagy a hivatkozást.");return}
-safeText($("readerGreeting"),"Kedves "+data.nev+"!");
-safeText($("readerLetter"),data.level);
-const extras=[
-data.dicseret?"⭐ Személyes dicséret\n"+data.dicseret:"",
-data.kedvenc_elfoglaltsag?"🎨 Amit szeretsz\n"+data.kedvenc_elfoglaltsag:"",
-data.jo_kivansag?"✨ Neked szóló jókívánság\n"+data.jo_kivansag:""
-].filter(Boolean);
-const personal=$("readerPersonalization");
-personal.replaceChildren();
-personal.classList.toggle("hidden",extras.length===0);
-for(const extra of extras){
-const p=document.createElement("div");
-p.className="personal-note";p.textContent=extra;personal.appendChild(p);
-}
-const created=data.letrehozva?new Date(data.letrehozva):new Date();
-safeText($("letterMeta"),"Kiállítva: "+created.toLocaleDateString("hu-HU")+" · Északi-sarki levél");
-clearMessage("readerStatus");
-show("envelopeStage",true);
-show("readerContent",false);
-const audio=$("readerAudio"),video=$("readerVideo");
-show("readerAudioBox",!!data.hang_url);
-if(data.hang_url){audio.src=data.hang_url;audio.load()}
-show("readerVideoBox",!!data.video_url);
-if(data.video_url){video.src=data.video_url;video.load()}
-show("readerCertificateBox",!!data.oklevel_url);
-if(data.oklevel_url){
-const url=data.oklevel_url;
-$("readerCertificateOpen").href=url;
-$("readerCertificateDownload").href=url;
-if(/\.(png|jpe?g)(?:[?#]|$)/i.test(url)){
-$("readerCertificateImage").src=url;
-show("readerCertificateImage",true);
-}
-}
+  displayedPublicId=id;
+  show("readerContent",false);
+  show("envelopeStage",false);
+  message("readerStatus","A Mikulás levele úton van hozzád...");
+  resetReaderMedia();
+  const {data,error}=await db.from(TABLE).select("*").eq("id",id).maybeSingle();
+  if(displayedPublicId!==id)return;
+  if(error||!data){message("readerStatus","Ez a levél nem található. Ellenőrizd a QR-kódot vagy a hivatkozást.");return}
+  safeText($("readerGreeting"),"Kedves "+data.nev+"!");
+  safeText($("readerLetter"),data.level);
+  const extras=[
+    data.dicseret?"⭐ Személyes dicséret\n"+data.dicseret:"",
+    data.kedvenc_elfoglaltsag?"🎨 Amit szeretsz\n"+data.kedvenc_elfoglaltsag:"",
+    data.jo_kivansag?"✨ Neked szóló jókívánság\n"+data.jo_kivansag:""
+  ].filter(Boolean);
+  const personal=$("readerPersonalization");
+  personal.replaceChildren();
+  personal.classList.toggle("hidden",extras.length===0);
+  for(const extra of extras){
+    const p=document.createElement("div");
+    p.className="personal-note";p.textContent=extra;personal.appendChild(p);
+  }
+  const created=data.letrehozva?new Date(data.letrehozva):new Date();
+  safeText($("letterMeta"),"Kiállítva: "+created.toLocaleDateString("hu-HU")+" · Északi-sarki levél");
+  clearMessage("readerStatus");
+  show("envelopeStage",true);
+  show("readerContent",false);
+  const audio=$("readerAudio"),video=$("readerVideo");
+  show("readerAudioBox",!!data.hang_url);
+  if(data.hang_url){audio.src=data.hang_url;audio.load()}
+  show("readerVideoBox",!!data.video_url);
+  if(data.video_url){video.src=data.video_url;video.load()}
+  show("readerCertificateBox",!!data.oklevel_url);
+  if(data.oklevel_url){
+    const url=data.oklevel_url;
+    $("readerCertificateOpen").href=url;
+    $("readerCertificateDownload").href=url;
+    if(/\.(png|jpe?g)(?:[?#]|$)/i.test(url)){
+      $("readerCertificateImage").src=url;
+      show("readerCertificateImage",true);
+    }
+  }
 }
 
 $("printLetterBtn").addEventListener("click",()=>window.print());
 $("openEnvelopeBtn").addEventListener("click",()=>{
-show("envelopeStage",false);
-show("readerContent",true);
+  show("envelopeStage",false);
+  show("readerContent",true);
 });
-
 window.addEventListener("hashchange",setPage);
 
 (async function init(){
-startSnow();
-const {data}=await db.auth.getSession();
-currentSession=data.session;
-await refreshAdminStatus();
+  startSnow();
+  const {data}=await db.auth.getSession();
+  currentSession=data.session;
+  await refreshAdminStatus();
 })();
 </script>
 </body>
