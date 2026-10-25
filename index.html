@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="hu">
 <head>
@@ -123,6 +124,10 @@ main{max-width:none;margin:0;padding:0}
 <form id="letterForm">
 <input type="hidden" id="letterId">
 <label for="nev">A címzett neve</label><input id="nev" maxlength="200" required placeholder="Például: Olivér">
+
+<label for="levelDatum">📅 A levél dátuma</label>
+<input id="levelDatum" type="text" maxlength="30" placeholder="Például: 2027.12.06.">
+
 <label for="uzenet">A Mikulás levele</label><textarea id="uzenet" required placeholder="Kedves Olivér!&#10;&#10;..."></textarea>
 <label for="dicseret">⭐ Személyes dicséret (nem kötelező)</label><textarea id="dicseret" maxlength="1000" placeholder="Például: Nagyon büszke vagyok rád..."></textarea>
 <label for="kedvenc">🎨 Kedvenc elfoglaltság (nem kötelező)</label><input id="kedvenc" maxlength="500" placeholder="Például: rajzolás, focizás">
@@ -277,7 +282,17 @@ const audioFile=$("audioFile").files[0],videoFile=$("videoFile").files[0],certif
 if(audioFile)audioUrl=await uploadMedia(audioFile,"audio");
 if(videoFile)videoUrl=await uploadMedia(videoFile,"video");
 if(certificateFile)certificateUrl=await uploadMedia(certificateFile,"certificate");
-const record={nev:name,level:letter,dicseret:$("dicseret").value.trim()||null,kedvenc_elfoglaltsag:$("kedvenc").value.trim()||null,jo_kivansag:$("joKivansag").value.trim()||null,hang_url:audioUrl,video_url:videoUrl,oklevel_url:certificateUrl};
+const record={
+nev:name,
+level:letter,
+level_datum:$("levelDatum").value.trim()||null,
+dicseret:$("dicseret").value.trim()||null,
+kedvenc_elfoglaltsag:$("kedvenc").value.trim()||null,
+jo_kivansag:$("joKivansag").value.trim()||null,
+hang_url:audioUrl,
+video_url:videoUrl,
+oklevel_url:certificateUrl
+};
 const result=id?await db.from(TABLE).update(record).eq("id",id).select().single():await db.from(TABLE).insert(record).select().single();
 if(result.error)throw result.error;
 message("adminStatus","Sikeresen elmentve! A levél egyedi QR-kódja a listában található.");
@@ -302,7 +317,7 @@ if(!data.length){$("letterList").textContent="Még nincs elmentett levél. Kész
 for(const item of data){
 const entry=document.createElement("div");entry.className="entry";
 const title=document.createElement("h3");title.textContent="🎁 "+item.nev;entry.appendChild(title);
-const date=document.createElement("p");date.className="small";date.textContent=item.letrehozva?new Date(item.letrehozva).toLocaleString("hu-HU"):"";entry.appendChild(date);
+const date=document.createElement("p");date.className="small";date.textContent=item.level_datum|| (item.letrehozva?new Date(item.letrehozva).toLocaleString("hu-HU"):"");entry.appendChild(date);
 const link=publicLetterUrl(item.id),open=document.createElement("a");open.href=link;open.textContent="A levél megnyitása";open.target="_blank";open.rel="noopener";entry.appendChild(open);
 const qr=document.createElement("img");qr.className="qr";qr.alt="QR-kód: "+item.nev;qr.loading="lazy";qr.src="https://api.qrserver.com/v1/create-qr-code/?size=350x350&data="+encodeURIComponent(link);entry.appendChild(qr);
 const copy=document.createElement("button");copy.textContent="Hivatkozás másolása";
@@ -317,6 +332,7 @@ $("letterList").appendChild(entry)
 
 function editLetter(item){
 currentLetter=item;$("letterId").value=item.id;$("nev").value=item.nev||"";$("uzenet").value=item.level||"";
+$("levelDatum").value=item.level_datum||"";
 $("dicseret").value=item.dicseret||"";$("kedvenc").value=item.kedvenc_elfoglaltsag||"";$("joKivansag").value=item.jo_kivansag||"";
 $("audioFile").value="";$("videoFile").value="";$("certificateFile").value="";
 $("currentAudio").textContent=item.hang_url?"Jelenlegi hangfelvétel megmarad, ha nem választasz újat.":"Nincs jelenlegi hangfelvétel.";
@@ -352,8 +368,7 @@ data.jo_kivansag?"✨ Neked szóló jókívánság\n"+data.jo_kivansag:""
 ].filter(Boolean);
 const personal=$("readerPersonalization");personal.replaceChildren();personal.classList.toggle("hidden",extras.length===0);
 for(const extra of extras){const p=document.createElement("div");p.className="personal-note";p.textContent=extra;personal.appendChild(p)}
-const created=data.letrehozva?new Date(data.letrehozva):new Date();
-safeText($("letterMeta"),"Kiállítva: "+created.toLocaleDateString("hu-HU")+" · Északi-sarki levél");
+safeText($("letterMeta"),data.level_datum?"Kelt: "+data.level_datum+" · Északi-sarki levél":"");
 safeText($("autoCertificateText"),data.nev+" részére, a Mikulás személyes elismerésével.");
 show("autoCertificateBox",true);clearMessage("readerStatus");show("envelopeStage",true);show("readerContent",false);
 const audio=$("readerAudio"),video=$("readerVideo");
@@ -376,7 +391,7 @@ window.setTimeout(()=>{show("envelopeStage",false);show("readerContent",true);$(
 
 $("printCertificateBtn").addEventListener("click",()=>{
 const name=$("readerGreeting").textContent.replace(/^Kedves\s*/,"").replace(/!$/,"");
-const date=$("letterMeta").textContent.replace(/^Kiállítva:\s*/,"");
+const date=$("letterMeta").textContent.replace(/^Kelt:\s*/,"").replace(/\s*·.*$/,"");
 const cert=`<!DOCTYPE html><html lang="hu"><head><meta charset="UTF-8"><title>Mikulás-oklevél</title><style>@page{size:A4 landscape;margin:12mm}body{font-family:Georgia,serif;text-align:center;color:#573d20;background:#fffaf0;padding:25px;border:12px double #b89545}h1{font-size:38px;color:#8e2033;margin:18px}h2{font-size:28px;margin:25px}p{font-size:19px;line-height:1.7}.seal{border:3px dashed #b89545;border-radius:50%;padding:18px;display:inline-block;margin:20px;color:#8e2033;font:bold 13px Arial}</style></head><body><div style="font-size:50px">🎅 ✦ ❄ ✦ 🎄</div><h1>ÉSZAKI-SARKI ELISMERŐ OKLEVÉL</h1><p>Ez az oklevél szeretettel és ünnepi varázslattal készült</p><h2>${escapeHtml(name)}</h2><p>részére, a Mikulás személyes jókívánságával.<br>Legyen az ünneped örömteli, vidám és varázslatos!</p><div class="seal">ÉSZAKI-SARKI POSTA<br>HIVATALOS OKLEVÉL ✦</div><p>${escapeHtml(date)}</p><h2>A Mikulás 🎅</h2><script>window.onload=()=>window.print()<\/script></body></html>`;
 const w=window.open("","_blank");
 if(!w){alert("A böngésző letiltotta a felugró ablakot. Engedélyezd az oldal számára, majd próbáld újra.");return}
